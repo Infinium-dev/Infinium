@@ -15,6 +15,7 @@
 #include "rpc_api.hpp"
 #include "seria/BinaryInputStream.hpp"
 #include "seria/BinaryOutputStream.hpp"
+#include "CryptoNoteConfig.hpp"
 
 using namespace cn;
 using namespace platform;
@@ -1148,9 +1149,12 @@ void BlockChain::build_blods() {
 	api::BlockHeader last_hard_checkpoint_header;
 	if (!get_header(m_currency.last_hard_checkpoint().hash, &last_hard_checkpoint_header))
 		return;
-	invariant(last_hard_checkpoint_header.hash == m_currency.genesis_block_hash ||
-	              last_hard_checkpoint_header.major_version == 1 + m_currency.upgrade_heights.size(),
-	    "When adding checkpoint after consensus update, always update currency.upgrade_heights");
+	if(cn::parameters::DISABLE_VERSION_CHECK_FOR_CHECKPOINT==false)
+	{
+		invariant(last_hard_checkpoint_header.hash == m_currency.genesis_block_hash ||
+	    	          last_hard_checkpoint_header.major_version == 1 + m_currency.upgrade_heights.size(),
+	    	"When adding checkpoint after consensus update, always update currency.upgrade_heights");
+	}
 
 	std::set<Hash> bad_header_hashes;   // sidechains that do not pass through last hard checkpoint
 	std::set<Hash> good_header_hashes;  // sidechains that pass through last hard checkpoint
