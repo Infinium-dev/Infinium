@@ -20,7 +20,7 @@
 
 using namespace cn;
 
-static const char USAGE[] = R"(walletd )" bytecoin_VERSION_STRING R"(.
+static const char USAGE[] = R"(walletd )" infinium_VERSION_STRING R"(.
 
 Usage:
   walletd [options] --wallet-file=<file>

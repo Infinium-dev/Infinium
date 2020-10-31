@@ -348,7 +348,7 @@ void BlockChainState::check_standalone_consensus(
 			throw ConsensusError(common::to_string(
 			    "Wrong merge mining merkle root, tag", mm_tag.merkle_root, "actual", aux_blocks_merkle_root));
 	}
-#if bytecoin_ALLOW_CM
+#if infinium_ALLOW_CM
 	if (block.header.is_cm_mined()) {
 		if (!crypto::cm_branch_valid(block.header.cm_merkle_branch))
 			throw ConsensusError("CM branch invalid");

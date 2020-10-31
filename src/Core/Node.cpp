@@ -906,7 +906,7 @@ void Node::submit_block(const BinaryArray &blockblob, api::BlockHeader *info) {
 bool Node::on_submitblock(http::Client *, http::RequestBody &&, json_rpc::Request &&,
     api::cnd::SubmitBlock::Request &&req, api::cnd::SubmitBlock::Response &res) {
 	if (!req.cm_nonce.empty()) {
-#if bytecoin_ALLOW_CM
+#if infinium_ALLOW_CM
 		// Experimental, a bit hacky
 		BlockTemplate bt;
 		seria::from_binary(bt, req.blocktemplate_blob);

@@ -55,7 +55,7 @@ protected:
 	virtual void on_msg_ping(p2p::PingLegacy::Response &&) {}       // called after some internal processing
 	virtual void on_msg_timed_sync(p2p::TimedSync::Request &&) {}   // called after some internal processing
 	virtual void on_msg_timed_sync(p2p::TimedSync::Response &&) {}  // called after some internal processing
-#if bytecoin_ALLOW_DEBUG_COMMANDS
+#if infinium_ALLOW_DEBUG_COMMANDS
 	virtual void on_msg_stat_info(p2p::GetStatInfo::Request &&) {}
 	virtual void on_msg_stat_info(p2p::GetStatInfo::Response &&) {}
 #endif

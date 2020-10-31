@@ -789,7 +789,7 @@ void Node::P2PProtocolBytecoin::on_msg_notify_checkpoint(p2p::Checkpoint::Notify
 	m_node->advance_long_poll();
 }
 
-#if bytecoin_ALLOW_DEBUG_COMMANDS
+#if infinium_ALLOW_DEBUG_COMMANDS
 
 void Node::P2PProtocolBytecoin::on_msg_stat_info(p2p::GetStatInfo::Request &&req) {
 	if (!m_node->check_trust(req.tr))

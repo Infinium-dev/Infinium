@@ -434,7 +434,7 @@ bool WalletState::sync_with_blockchain(api::cnd::SyncMemPool::Response &resp) {
 			remove_transaction_from_mempool(tid, false);
 	}
 	if (resp.added_raw_transactions.size() != resp.added_transactions.size())
-		throw std::runtime_error("bytecoind error - SyncMemPool inconsistent transaction counts");
+		throw std::runtime_error("infiniumd error - SyncMemPool inconsistent transaction counts");
 	for (size_t i = 0; i != resp.added_raw_transactions.size(); ++i) {
 		const Hash tid    = resp.added_transactions.at(i).hash;
 		const size_t size = resp.added_transactions.at(i).size;

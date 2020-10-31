@@ -1,8 +1,9 @@
 # Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers.
+# Copyright (c) 2020-2020, The Infinium developers.
 # Licensed under the GNU Lesser General Public License. See LICENSE for details.
 
 cmake_minimum_required(VERSION 3.0)
-project(bytecoin)
+project(infinium)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_C_STANDARD 11)
 set(CRYPTONOTE_NAME infinium)
@@ -162,11 +163,11 @@ endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/libs")
-add_library(bytecoin-crypto ${SRC_CRYPTO})
-add_library(bytecoin-core ${SOURCE_FILES})
-target_link_libraries(bytecoin-core bytecoin-crypto ${USBLIB_LIBRARY})
+add_library(infinium-crypto ${SRC_CRYPTO})
+add_library(infinium-core ${SOURCE_FILES})
+target_link_libraries(infinium-core infinium-crypto ${USBLIB_LIBRARY})
 
-link_libraries(bytecoin-crypto bytecoin-core)
+link_libraries(infinium-crypto infinium-core)
 if(APPLE)
     link_libraries(-dead_strip)
 endif()

@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers.
+// Copyright (c) 2020-2020, The Infinium developers.
 // Licensed under the GNU Lesser General Public License. See LICENSE for details.
 
 #include "CryptoNote.hpp"
@@ -408,7 +409,7 @@ void ser_members(BlockHeader &v,
 			}
 			return;
 		}
-#if bytecoin_ALLOW_CM
+#if infinium_ALLOW_CM
 		if (v.is_cm_mined()) {
 			seria_kv("timestamp", v.timestamp, s);
 			seria_kv("previous_block_hash", v.previous_block_hash, s);
@@ -443,7 +444,7 @@ void ser_members(BlockHeader &v,
 		}
 		return;
 	}
-#if bytecoin_ALLOW_CM
+#if infinium_ALLOW_CM
 	if (v.is_cm_mined()) {
 		if (seria_type == BlockSeriaType::LONG_BLOCKHASH) {
 			Hash cm_merkle_root = crypto::tree_hash_from_cm_branch(

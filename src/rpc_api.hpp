@@ -855,7 +855,7 @@ namespace seria {
 class ISeria;
 
 void ser_members(cn::api::EmptyStruct &v, ISeria &s);
-void ser_members(cn::api::Output &v, ISeria &s, bool only_bytecoind_fields = false);
+void ser_members(cn::api::Output &v, ISeria &s, bool only_infiniumd_fields = false);
 void ser_members(cn::api::BlockHeader &v, ISeria &s);
 void ser_members(cn::api::cnd::BlockHeaderLegacy &v, ISeria &s);
 void ser_members(cn::api::Transfer &v, ISeria &s);

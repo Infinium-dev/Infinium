@@ -27,10 +27,12 @@ const char GENESIS_COINBASE_TX_HEX[] =
 //constexpr UUID BYTECOIN_NETWORK = common::pfh<UUID>("11100111110001011011001210110110");  // Bender's nightmare
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
-const Height UPGRADE_HEIGHT_V2                  = 2500000;
-const Height UPGRADE_HEIGHT_V3                  = 2500001;
-const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT = 2500002;
-const Height INFINIUM_BLOCK_REWARD_LOWERING     = 2500010;
+const Height INFINIUM_FIRST_HARDFORK            = 2500000;
+
+const Height UPGRADE_HEIGHT_V2                  = INFINIUM_FIRST_HARDFORK;
+const Height UPGRADE_HEIGHT_V3                  = INFINIUM_FIRST_HARDFORK+1;
+const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT = INFINIUM_FIRST_HARDFORK+2;
+const Height INFINIUM_BLOCK_REWARD_LOWERING     = INFINIUM_FIRST_HARDFORK+10;
 
 // Radical simplification of consensus rules starts from versions
 const uint8_t BLOCK_VERSION_AMETHYST       = 4;

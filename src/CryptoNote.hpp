@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2018, The CryptoNote developers, The Bytecoin developers.
+// Copyright (c) 2020-2020, The Infinium developers.
 // Licensed under the GNU Lesser General Public License. See LICENSE for details.
 
 #pragma once
@@ -12,9 +13,9 @@
 #include "crypto/types.hpp"
 
 // We define here, as CryptoNoteConfig.h is never included anywhere anymore
-#define bytecoin_ALLOW_DEBUG_COMMANDS 1
+#define infinium_ALLOW_DEBUG_COMMANDS 1
 
-#define bytecoin_ALLOW_CM 0
+#define infinium_ALLOW_CM 0
 
 namespace cn {
 

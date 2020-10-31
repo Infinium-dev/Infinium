@@ -208,7 +208,7 @@ Trezor::Trezor(const std::string &path) : m_path(path), m_socket(platform::Event
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinStartRequest));
 	messages::bytecoin::BytecoinStartResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinStartResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin init message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium init message failed to decode, msg=" + http_resp.body);
 	std::string major;
 	std::string minor;
 	if (!split_string(resp.version, ".", major, minor))
@@ -264,7 +264,7 @@ std::vector<cn::PublicKey> Trezor::scan_outputs(const std::vector<cn::PublicKey>
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinScanOutputsRequest));
 	messages::bytecoin::BytecoinScanOutputsResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinScanOutputsResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin scan_outputs message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium scan_outputs message failed to decode, msg=" + http_resp.body);
 	for (const auto &dst : resp.Pv) {
 		PublicKey pv;
 		seria::from_binary(pv, dst);
@@ -283,7 +283,7 @@ cn::KeyImage Trezor::generate_keyimage(const common::BinaryArray &output_secret_
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinGenerateKeyimageRequest));
 	messages::bytecoin::BytecoinGenerateKeyimageResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinGenerateKeyimageResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin generate_keyimage message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium generate_keyimage message failed to decode, msg=" + http_resp.body);
 	KeyImage result;
 	seria::from_binary(result, resp.keyimage);
 	release();
@@ -300,7 +300,7 @@ Hash Trezor::generate_output_seed(const Hash &tx_inputs_hash, size_t out_index) 
 	messages::bytecoin::BytecoinGenerateOutputSeedResponse resp;
 	if (!decode_any(
 	        resp, messages::MessageType_BytecoinGenerateOutputSeedResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin generate_output_seed message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium generate_output_seed message failed to decode, msg=" + http_resp.body);
 	Hash result;
 	seria::from_binary(result, resp.output_seed);
 	release();
@@ -319,7 +319,7 @@ void Trezor::sign_start(size_t version, uint64_t ut, size_t inputs_size, size_t 
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignStartRequest));
 	messages::bytecoin::BytecoinEmptyResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinEmptyResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin sign_start message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium sign_start message failed to decode, msg=" + http_resp.body);
 	release();
 }
 
@@ -336,7 +336,7 @@ void Trezor::sign_add_input(uint64_t amount, const std::vector<size_t> &output_i
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignAddInputRequest));
 	messages::bytecoin::BytecoinEmptyResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinEmptyResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin sign_add_input message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium sign_add_input message failed to decode, msg=" + http_resp.body);
 	release();
 }
 
@@ -355,7 +355,7 @@ void Trezor::sign_add_output(bool change, uint64_t amount, size_t change_address
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignAddOutputRequest));
 	messages::bytecoin::BytecoinSignAddOutputResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinSignAddOutputResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin sign_add_output message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium sign_add_output message failed to decode, msg=" + http_resp.body);
 	seria::from_binary(*public_key, resp.public_key);
 	seria::from_binary(*encrypted_secret, resp.encrypted_secret);
 	*encrypted_address_type = common::integer_cast<uint8_t>(resp.encrypted_address_type);
@@ -375,7 +375,7 @@ void Trezor::sign_add_extra(const BinaryArray &chunk) {
 		    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignAddExtraRequest));
 		messages::bytecoin::BytecoinEmptyResponse resp;
 		if (!decode_any(resp, messages::MessageType_BytecoinEmptyResponse, m_socket, m_session, http_resp.body))
-			throw Exception("Trezor bytecoin sign_add_extra message failed to decode, msg=" + http_resp.body);
+			throw Exception("Trezor infinium sign_add_extra message failed to decode, msg=" + http_resp.body);
 		pos = stop;
 		if (pos == chunk.size())
 			break;
@@ -393,7 +393,7 @@ void Trezor::sign_step_a(const common::BinaryArray &output_secret_hash_arg, size
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignStepARequest));
 	messages::bytecoin::BytecoinSignStepAResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinSignStepAResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin sign_step_a message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium sign_step_a message failed to decode, msg=" + http_resp.body);
 	seria::from_binary(*sig_p, resp.sig_p);
 	seria::from_binary(*y, resp.y);
 	seria::from_binary(*z, resp.z);
@@ -411,7 +411,7 @@ void Trezor::sign_step_a_more_data(const BinaryArray &data) {
 		    m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignStepAMoreDataRequest));
 		messages::bytecoin::BytecoinEmptyResponse resp;
 		if (!decode_any(resp, messages::MessageType_BytecoinEmptyResponse, m_socket, m_session, http_resp.body))
-			throw Exception("Trezor bytecoin sign_step_a_more_data message failed to decode, msg=" + http_resp.body);
+			throw Exception("Trezor infinium sign_step_a_more_data message failed to decode, msg=" + http_resp.body);
 		pos = stop;
 		if (pos == data.size())
 			break;
@@ -426,7 +426,7 @@ crypto::EllipticCurveScalar Trezor::sign_get_c0() {
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignGetC0Request));
 	messages::bytecoin::BytecoinSignGetC0Response resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinSignGetC0Response, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin sign_get_c0 message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium sign_get_c0 message failed to decode, msg=" + http_resp.body);
 	crypto::EllipticCurveScalar c0;
 	seria::from_binary(c0, resp.c0);
 	release();
@@ -444,7 +444,7 @@ void Trezor::sign_step_b(const common::BinaryArray &output_secret_hash_arg, size
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinSignStepBRequest));
 	messages::bytecoin::BytecoinSignStepBResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinSignStepBResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin sign_step_b message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium sign_step_b message failed to decode, msg=" + http_resp.body);
 	seria::from_binary(*sig_my_rr, resp.my_rr);
 	seria::from_binary(*sig_rs, resp.rs);
 	seria::from_binary(*sig_ra, resp.ra);
@@ -460,7 +460,7 @@ void Trezor::proof_start(const common::BinaryArray &data) {
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinStartProofRequest));
 	messages::bytecoin::BytecoinEmptyResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinEmptyResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin proof_start message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium proof_start message failed to decode, msg=" + http_resp.body);
 	release();
 	sign_add_extra(data);
 }
@@ -473,7 +473,7 @@ void Trezor::export_view_only(SecretKey *audit_key_base_secret_key, SecretKey *v
 	    trezor_post(m_socket, "/call/" + m_session, encode(req, messages::MessageType_BytecoinExportViewWalletRequest));
 	messages::bytecoin::BytecoinExportViewWalletResponse resp;
 	if (!decode_any(resp, messages::MessageType_BytecoinExportViewWalletResponse, m_socket, m_session, http_resp.body))
-		throw Exception("Trezor bytecoin export_view_only message failed to decode, msg=" + http_resp.body);
+		throw Exception("Trezor infinium export_view_only message failed to decode, msg=" + http_resp.body);
 	seria::from_binary(*audit_key_base_secret_key, resp.audit_key_base_secret_key);
 	seria::from_binary(*view_secret_key, resp.view_secret_key);
 	seria::from_binary(*view_seed, resp.view_seed);

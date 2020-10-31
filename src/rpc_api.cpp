@@ -80,7 +80,7 @@ bool api::walletd::GetStatus::Response::ready_for_longpoll(const Request &other)
 
 namespace seria {
 
-void ser_members(api::Output &v, ISeria &s, bool only_bytecoind_fields) {
+void ser_members(api::Output &v, ISeria &s, bool only_infiniumd_fields) {
 	seria_kv("amount", v.amount, s);
 	seria_kv("public_key", v.public_key, s);
 	seria_kv("stack_index", v.stack_index, s);
@@ -91,9 +91,9 @@ void ser_members(api::Output &v, ISeria &s, bool only_bytecoind_fields) {
 		seria_kv("unlock_time", v.unlock_block_or_timestamp, s);  // deprecated
 	if (dynamic_cast<seria::JsonInputStream *>(&s))
 		seria_kv("unlock_time", v.unlock_block_or_timestamp, s);  // deprecated
-	if (!only_bytecoind_fields)
+	if (!only_infiniumd_fields)
 		seria_kv("index_in_transaction", v.index_in_transaction, s);
-	if (!only_bytecoind_fields) {
+	if (!only_infiniumd_fields) {
 		seria_kv("transaction_hash", v.transaction_hash, s);
 		seria_kv("key_image", v.key_image, s);
 		seria_kv("address", v.address, s);

@@ -173,7 +173,7 @@ protected:
 		void on_msg_notify_new_block(p2p::RelayBlock::Notify &&) override;
 		void on_msg_notify_new_transactions(p2p::RelayTransactions::Notify &&) override;
 		void on_msg_notify_checkpoint(p2p::Checkpoint::Notify &&) override;
-#if bytecoin_ALLOW_DEBUG_COMMANDS
+#if infinium_ALLOW_DEBUG_COMMANDS
 		void on_msg_stat_info(p2p::GetStatInfo::Request &&) override;
 #endif
 	public:

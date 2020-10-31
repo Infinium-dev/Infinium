@@ -1235,7 +1235,7 @@ void BlockChain::fill_statistics(api::cnd::GetStatistics::Response &res) const {
 bool BlockChain::fill_next_block_versions(
     const api::BlockHeader &prev_info, uint8_t *major_mm, uint8_t *major_cm) const {
 	*major_cm = *major_mm = m_currency.get_block_major_version_for_height(prev_info.height + 1);
-#if bytecoin_ALLOW_CM
+#if infinium_ALLOW_CM
 	if (*major_cm >= m_currency.amethyst_block_version)
 		*major_cm += 1;
 #endif
@@ -1249,7 +1249,7 @@ bool BlockChain::fill_next_block_versions(
 	if (!bit->second.upgrade_decided_height || prev_info.height + 1 < bit->second.upgrade_decided_height)
 		return true;
 	*major_cm = *major_mm = m_currency.upgrade_desired_major;
-#if bytecoin_ALLOW_CM
+#if infinium_ALLOW_CM
 	if (*major_cm >= m_currency.amethyst_block_version)
 		*major_cm += 1;
 #endif

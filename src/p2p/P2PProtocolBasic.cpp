@@ -40,7 +40,7 @@ const std::map<std::pair<uint32_t, LevinProtocol::CommandType>,
     P2PProtocolBasic::after_handshake_handlers = {
         levin_pair<p2p::TimedSync::Request>(&P2PProtocolBasic::msg_timed_sync),
         levin_pair<p2p::TimedSync::Response>(&P2PProtocolBasic::msg_timed_sync),
-#if bytecoin_ALLOW_DEBUG_COMMANDS
+#if infinium_ALLOW_DEBUG_COMMANDS
         levin_pair<p2p::GetStatInfo::Request>(&P2PProtocolBasic::on_msg_stat_info),
         levin_pair<p2p::GetStatInfo::Response>(&P2PProtocolBasic::on_msg_stat_info),
 #endif

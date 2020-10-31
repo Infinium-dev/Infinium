@@ -10,7 +10,7 @@
 
 using namespace cn;
 
-#if bytecoin_ALLOW_DEBUG_COMMANDS
+#if infinium_ALLOW_DEBUG_COMMANDS
 Hash p2p::ProofOfTrust::get_hash() const {
 	//	std::string s;
 	//  time was uint64_t here, adjust if seriously need this legacy peice of code
@@ -147,7 +147,7 @@ void ser_members(p2p::PingLegacy::Response &v, seria::ISeria &s) {
 	seria_kv("peer_id", v.peer_id, s);
 }
 
-#if bytecoin_ALLOW_DEBUG_COMMANDS
+#if infinium_ALLOW_DEBUG_COMMANDS
 void ser_members(p2p::ProofOfTrust &v, seria::ISeria &s) {
 	seria_kv("peer_id", v.peer_id, s);
 	seria_kv("time", v.time, s);

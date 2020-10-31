@@ -16,7 +16,7 @@
 
 using namespace cn;
 
-static const char USAGE[] = R"(bytecoind )" bytecoin_VERSION_STRING R"(.
+static const char USAGE[] = R"(bytecoind )" infinium_VERSION_STRING R"(.
 
 Usage:
   bytecoind [options]

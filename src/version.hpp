@@ -4,13 +4,13 @@
 #pragma once
 
 // defines are for Windows resource compiler
-#define bytecoin_VERSION_WINDOWS_COMMA 3, 19, 4, 18
-#define bytecoin_VERSION_STRING "v3.4.2 (amethyst)"
+#define infinium_VERSION_WINDOWS_COMMA 3, 19, 4, 18
+#define infinium_VERSION_STRING "v2.0.0 (New Chance)"
 
 #ifndef RC_INVOKED  // Windows resource compiler
 
 namespace cn {
-inline const char *app_version() { return bytecoin_VERSION_STRING; }
+inline const char *app_version() { return infinium_VERSION_STRING; }
 }  // namespace cn
 
 #endif
