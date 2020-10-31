@@ -322,10 +322,10 @@ void BlockChainState::check_standalone_consensus(
 
 		const auto max_transactions_cumulative_size = m_currency.max_block_transactions_cumulative_size(info->height);
 		if (info->transactions_size > max_transactions_cumulative_size)
-			throw ConsensusError(common::to_string("Cumulative block transactions size too big,",
+			throw ConsensusError(common::to_string("Cumulative block transactions size too big_1,",
 			    info->transactions_size, "should be <=", max_transactions_cumulative_size));
 		if (info->transactions_size > info->effective_size_median * 2)
-			throw ConsensusError(common::to_string("Cumulative block transactions size too big,",
+			throw ConsensusError(common::to_string("Cumulative block transactions size too big_2,",
 			    info->transactions_size, "should be <=", info->effective_size_median * 2));
 		if (block.header.is_merge_mined() && pb.parent_block_size > m_currency.max_header_size)
 			throw ConsensusError(common::to_string(
@@ -373,6 +373,7 @@ void BlockChainState::check_standalone_consensus(
 	}
 	const bool check_keys     = m_config.paranoid_checks || !m_currency.is_in_hard_checkpoint_zone(info->height);
 	const bool subgroup_check = info->height >= m_currency.key_image_subgroup_checking_height;
+	Difficulty diff_for_reward;
 	const Amount miner_reward = validate_semantic(
 	    m_currency, block.header.major_version, true, block.header.base_transaction, check_keys, subgroup_check);
 	size_t key_outputs_count = get_tx_key_outputs_count(block.header.base_transaction);
@@ -389,6 +390,7 @@ void BlockChainState::check_standalone_consensus(
 		std::reverse(timestamps.begin(), timestamps.end());
 		std::reverse(difficulties.begin(), difficulties.end());
 		info->difficulty = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties);
+		diff_for_reward = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties);;
 		info->cumulative_difficulty = prev_info.cumulative_difficulty + info->difficulty;
 	}
 
@@ -403,16 +405,16 @@ void BlockChainState::check_standalone_consensus(
 
 	if (is_amethyst) {
 		info->base_reward = m_currency.get_base_block_reward(
-		    block.header.major_version, info->height, prev_info.already_generated_coins);
+		    block.header.major_version, info->height, prev_info.already_generated_coins, diff_for_reward);
 		info->reward                  = info->base_reward + info->transactions_fee;
 		info->already_generated_coins = prev_info.already_generated_coins + info->base_reward;
 	} else {
 		SignedAmount emission_change = 0;
 		info->base_reward            = m_currency.get_block_reward(block.header.major_version, info->height,
-            info->effective_size_median, 0, prev_info.already_generated_coins, 0, &emission_change);
+            info->effective_size_median, 0, prev_info.already_generated_coins, 0, &emission_change, diff_for_reward);
 		info->reward =
 		    m_currency.get_block_reward(block.header.major_version, info->height, info->effective_size_median,
-		        info->transactions_size, prev_info.already_generated_coins, info->transactions_fee, &emission_change);
+		        info->transactions_size, prev_info.already_generated_coins, info->transactions_fee, &emission_change, diff_for_reward);
 		info->already_generated_coins = prev_info.already_generated_coins + emission_change;
 	}
 
@@ -501,7 +503,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		throw std::runtime_error(
 		    "Mining of block in chain not passing through last hard checkpoint is not possible (will not be accepted by network anyway)");
 	const bool is_amethyst = b->major_version >= m_currency.amethyst_block_version;
-
+	Difficulty diff_for_reward_calc;
 	clear_mining_transactions();  // We periodically forget transactions for old blocks we gave as templates
 	{
 		std::vector<Timestamp> timestamps;
@@ -516,6 +518,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		std::reverse(timestamps.begin(), timestamps.end());
 		std::reverse(difficulties.begin(), difficulties.end());
 		*difficulty = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties);
+		diff_for_reward_calc = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties);
 	}
 	b->nonce.resize(4);
 	if (b->is_merge_mined()) {
@@ -603,7 +606,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		block_capacity_vote = std::max(block_capacity_vote, m_currency.block_capacity_vote_min);
 		block_capacity_vote = std::min(block_capacity_vote, m_currency.block_capacity_vote_max);
 		Amount block_reward =
-		    txs_fee + m_currency.get_base_block_reward(b->major_version, *height, parent_info.already_generated_coins);
+		    txs_fee + m_currency.get_base_block_reward(b->major_version, *height, parent_info.already_generated_coins, diff_for_reward_calc);
 		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr);
 		extra_add_block_capacity_vote(b->base_transaction.extra, block_capacity_vote);
 		if (!extra_nonce.empty())
@@ -618,10 +621,11 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 	// and with phase we know think we know expected block size
 	// make blocks coin-base tx looks close to real coinbase tx to get truthful blob size
 	size_t cumulative_size   = txs_size;
+	SignedAmount* emission_change_inf = 0;
 	const size_t TRIES_COUNT = 11;
 	for (size_t try_count = 0; try_count < TRIES_COUNT; ++try_count) {
 		Amount block_reward = m_currency.get_block_reward(b->major_version, *height, effective_size_median,
-		    cumulative_size, parent_info.already_generated_coins, txs_fee);
+		    cumulative_size, parent_info.already_generated_coins, txs_fee, emission_change_inf, diff_for_reward_calc);
 		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr);
 		if (!extra_nonce.empty())
 			extra_add_nonce(b->base_transaction.extra, extra_nonce);

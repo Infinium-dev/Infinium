@@ -88,10 +88,10 @@ public:
 	PublicKey get_checkpoint_public_key(size_t key_id) const;
 	size_t get_checkpoint_keys_count() const { return checkpoint_keys_end - checkpoint_keys_begin; }
 
-	Amount get_base_block_reward(uint8_t block_major_version, Height height, Amount already_generated_coins) const;
+	Amount get_base_block_reward(uint8_t block_major_version, Height height, Amount already_generated_coins, Difficulty diff) const;
 	Amount get_block_reward(uint8_t block_major_version, Height height, size_t effective_median_size,
 	    size_t current_transactions_size, Amount already_generated_coins, Amount fee,
-	    SignedAmount *emission_change = nullptr) const;
+	    SignedAmount *emission_change = nullptr, Difficulty diff=1000) const;
 	Transaction construct_miner_tx(const Hash &miner_secret, uint8_t block_major_version, Height height,
 	    Amount block_reward, const AccountAddress &miner_address) const;
 

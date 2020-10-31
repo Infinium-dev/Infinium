@@ -253,17 +253,61 @@ size_t Currency::minimum_anonymity(uint8_t block_major_version) const {
 	return MINIMUM_ANONYMITY_V1_3;
 }
 
+namespace
+  {
+    const size_t log_fix_precision = 20;
+    static_assert(1 <= log_fix_precision && log_fix_precision < sizeof(uint64_t) * 8 / 2 - 1, "Invalid log precision");
+
+    uint64_t log2_fix(uint64_t x)
+    {
+      assert(x != 0);
+
+      uint64_t b = UINT64_C(1) << (log_fix_precision - 1);
+      uint64_t y = 0;
+
+      while (x >= (UINT64_C(2) << log_fix_precision))
+      {
+        x >>= 1;
+        y += UINT64_C(1) << log_fix_precision;
+      }
+
+      // 64 bits are enough, because of x < 2 * (1 << log_fix_precision) <= 2^32
+      uint64_t z = x;
+      for (size_t i = 0; i < log_fix_precision; i++)
+      {
+        z = (z * z) >> log_fix_precision;
+        if (z >= (UINT64_C(2) << log_fix_precision))
+        {
+          z >>= 1;
+          y += b;
+        }
+        b >>= 1;
+      }
+
+      return y;
+    }
+  }
+
 Amount Currency::get_base_block_reward(
-    uint8_t block_major_version, Height height, Amount already_generated_coins) const {
-	invariant(already_generated_coins <= money_supply, "");
+    uint8_t block_major_version, Height height, Amount already_generated_coins, Difficulty diff) const {
+	/*invariant(already_generated_coins <= money_supply, "");
 	invariant(emission_speed_factor > 0 && emission_speed_factor <= 8 * sizeof(Amount), "");
 
-	return (money_supply - already_generated_coins) >> emission_speed_factor;
+	return (money_supply - already_generated_coins) >> emission_speed_factor;*/
+	//infinium implementation
+	assert(diff != 0);
+    assert(static_cast<uint64_t>(diff) < (UINT64_C(1) << (sizeof(uint64_t) * 8 - log_fix_precision)));
+	Amount reward_basic = log2_fix(diff << log_fix_precision) << 20;
+	if(height > INFINIUM_BLOCK_REWARD_LOWERING)
+	{
+		reward_basic = (log2_fix(diff << log_fix_precision) << 20)/10;
+	}
+    return reward_basic;
 }
 
 Amount Currency::get_block_reward(uint8_t block_major_version, Height height, size_t effective_median_size,
-    size_t current_transactions_size, Amount already_generated_coins, Amount fee, SignedAmount *emission_change) const {
-	Amount base_reward = get_base_block_reward(block_major_version, height, already_generated_coins);
+    size_t current_transactions_size, Amount already_generated_coins, Amount fee, SignedAmount *emission_change, Difficulty diff) const {
+	Amount base_reward = get_base_block_reward(block_major_version, height, already_generated_coins, diff);
 
 	Amount penalized_base_reward = get_penalized_amount(base_reward, effective_median_size, current_transactions_size);
 	Amount penalized_fee =
