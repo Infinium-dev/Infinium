@@ -332,6 +332,10 @@ void BlockChainState::check_standalone_consensus(
 			    "Root block size too big,", pb.parent_block_size, "should be <=", m_currency.max_header_size));
 	}
 	if (block.header.is_merge_mined()) {
+		if(is_amethyst)
+		{
+			throw ConsensusError("Merged Mining is disabled!");
+		}
 		TransactionExtraMergeMiningTag mm_tag;
 		if (!extra_get_merge_mining_tag(block.header.root_block.base_transaction.extra, mm_tag))
 			throw ConsensusError("No merge mining tag");

@@ -329,6 +329,7 @@ int main(int argc, const char *argv[]) try {
 	boost::asio::io_service io;
 	platform::EventLoop run_loop(io);  // must be before Wallet creation (trezor uses io)
 
+
 	std::unique_ptr<Wallet> wallet;
 	const std::string wallet_file = read_non_empty("--wallet-file", cmd);
 	if (wallet_file.empty())

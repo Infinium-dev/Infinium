@@ -364,6 +364,7 @@ std::string WalletContainerStorage::export_keys() const {
 	return common::to_hex(result);
 }
 
+
 void WalletContainerStorage::save_and_check() {
 	const std::string tmp_path = m_path + ".tmp";
 
