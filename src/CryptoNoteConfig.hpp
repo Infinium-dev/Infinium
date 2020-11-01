@@ -27,7 +27,7 @@ const char GENESIS_COINBASE_TX_HEX[] =
 //constexpr UUID BYTECOIN_NETWORK = common::pfh<UUID>("11100111110001011011001210110110");  // Bender's nightmare
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
-const Height INFINIUM_FIRST_HARDFORK            = 2500000;
+const Height INFINIUM_FIRST_HARDFORK            = 2061467;
 
 const Height UPGRADE_HEIGHT_V2                    = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                    = INFINIUM_FIRST_HARDFORK+1;
@@ -52,10 +52,10 @@ const Amount MIN_DUST_THRESHOLD    = 1000000;            // Everything smaller w
 const Amount MAX_DUST_THRESHOLD    = 30000000000000000;  // Everything larger is dust because very few coins
 const Amount SELF_DUST_THRESHOLD   = 1000;               // forfeit outputs smaller than this in a change
 
-const uint64_t ADDRESS_BASE58_PREFIX          = 1288825;       // legacy addresses start with "2"
-const uint64_t ADDRESS_BASE58_PREFIX_AMETHYST = 1059449;  // addresses start with "bcnZ", varintdata={0xce, 0xf6, 0x22}
+const uint64_t ADDRESS_BASE58_PREFIX          = 1288825;       // legacy addresses start with "inf8"
+const uint64_t ADDRESS_BASE58_PREFIX_AMETHYST = 88386169;  // addresses start with "infi8"
 const uint64_t SENDPROOF_BASE58_PREFIX =
-    1174923897;  // proofs start with "infprf", varintdata={0xce, 0xf5, 0xe2, 0x80, 0x91, 0xdd, 0x13}
+    1174923897;  // proofs start with "infprf"
 const char BLOCKS_FILENAME[]       = "blocks.bin";
 const char BLOCKINDEXES_FILENAME[] = "blockindexes.bin";
 

@@ -300,7 +300,7 @@ Amount Currency::get_base_block_reward(
 	Amount reward_basic = log2_fix(diff << log_fix_precision) << 20;
 	if(height > INFINIUM_BLOCK_REWARD_LOWERING)
 	{
-		reward_basic = (log2_fix(diff << log_fix_precision) << 20)/5;
+		reward_basic = (log2_fix(diff << log_fix_precision) << 20)/2;
 	}
     return reward_basic;
 }
