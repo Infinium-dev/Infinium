@@ -56,7 +56,7 @@ void ser_members(cn::SendproofAmethyst &v, ISeria &s) {
 		seria_kv("address", v.address_simple, s);
 		seria_kv("derivation", v.derivation, s);
 		seria_kv("signature", v.signature, s);
-	} else if (v.version == 4) {
+	} else if (v.version == parameters::TRANSACTION_VERSION_AMETHYST) {
 		seria_kv("elements", v.elements, s);
 	} else
 		throw std::runtime_error(
