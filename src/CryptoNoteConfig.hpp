@@ -31,7 +31,7 @@ const Height INFINIUM_FIRST_HARDFORK            = 2061467;
 
 const Height UPGRADE_HEIGHT_V2                    = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                    = INFINIUM_FIRST_HARDFORK+1;
-const Height UPGRADE_HEIGHT_V4                    = INFINIUM_FIRST_HARDFORK+3;
+const Height UPGRADE_HEIGHT_V4                    = INFINIUM_FIRST_HARDFORK+453;
 const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT   = INFINIUM_FIRST_HARDFORK+2;
 const Height INFINIUM_BLOCK_REWARD_LOWERING       = INFINIUM_FIRST_HARDFORK+10;
 const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT = true; //enabled only becouse of impoting old chain, never use in normal situation 
