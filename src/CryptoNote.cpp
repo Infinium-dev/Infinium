@@ -393,7 +393,7 @@ void ser_members(BlockHeader &v,
 	if (seria_type == BlockSeriaType::NORMAL) {
 		seria_kv("major_version", v.major_version, s);
 		seria_kv("minor_version", v.minor_version, s);
-		if (v.major_version == 1) {
+		if (!v.is_merge_mined()) {
 			seria_kv("timestamp", v.timestamp, s);
 			seria_kv("previous_block_hash", v.previous_block_hash, s);
 			v.nonce.resize(4);
@@ -420,7 +420,7 @@ void ser_members(BlockHeader &v,
 #endif
 		throw std::runtime_error("Unknown block major version " + common::to_string(v.major_version));
 	}
-	if (v.major_version == 1) {
+	if (!v.is_merge_mined()) {
 		seria_kv("major_version", v.major_version, s);
 		seria_kv("minor_version", v.minor_version, s);
 		seria_kv("timestamp", v.timestamp, s);
