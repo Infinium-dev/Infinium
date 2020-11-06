@@ -15,6 +15,7 @@
 #include "crypto/crypto.hpp"
 #include "platform/Time.hpp"
 #include "seria/ISeria.hpp"
+#include "CryptoNoteConfig.hpp"
 
 using namespace cn;
 using namespace platform;
@@ -204,7 +205,7 @@ void PeerDB::merge_peerlist_from_p2p(const NetworkAddress &addr,
 	for (auto &&pp : outer_bs) {
 		add_incoming_peer_impl(pp, now);
 	}
-	if (is_seed(addr)) {
+	if (is_seed(addr) && cn::parameters::ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT==false) {
 		m_log(logging::INFO) << "Delaying connect to seed " << addr << " because got peer list size=" << outer_bs.size()
 		                     << std::endl;
 		delay_connection_attempt(addr, now);
@@ -222,7 +223,7 @@ void PeerDB::merge_peerlist_from_p2p(const NetworkAddress &addr,
 		na.port = pp.adr.port;
 		add_incoming_peer_impl(na, now);
 	}
-	if (is_seed(addr)) {
+	if (is_seed(addr) && cn::parameters::ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT==false) {
 		m_log(logging::INFO) << "Delaying connect to seed " << addr << " because got peer list size=" << outer_bs.size()
 		                     << std::endl;
 		delay_connection_attempt(addr, now);

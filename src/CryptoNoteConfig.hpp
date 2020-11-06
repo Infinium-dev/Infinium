@@ -29,12 +29,13 @@ constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78
 
 const Height INFINIUM_FIRST_HARDFORK            = 2065600;
 
-const Height UPGRADE_HEIGHT_V2                    = INFINIUM_FIRST_HARDFORK;
-const Height UPGRADE_HEIGHT_V3                    = INFINIUM_FIRST_HARDFORK+1;
-const Height UPGRADE_HEIGHT_V4                    = INFINIUM_FIRST_HARDFORK+4;
-const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT   = INFINIUM_FIRST_HARDFORK+2;
-const Height INFINIUM_BLOCK_REWARD_LOWERING       = INFINIUM_FIRST_HARDFORK+10;
-const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT = false; //enabled only becouse of impoting old chain, never use in normal situation 
+const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
+const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
+const Height UPGRADE_HEIGHT_V4                                         = INFINIUM_FIRST_HARDFORK+4;
+const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT                        = INFINIUM_FIRST_HARDFORK+2;
+const Height INFINIUM_BLOCK_REWARD_LOWERING                            = INFINIUM_FIRST_HARDFORK+10;
+const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = false; //enabled only becouse of impoting old chain, never use in normal situation 
+const size_t ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT = true;
 
 // Radical simplification of consensus rules starts from versions
 const uint8_t BLOCK_VERSION_AMETHYST       = 4;
