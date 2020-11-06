@@ -34,7 +34,7 @@ const Height UPGRADE_HEIGHT_V3                    = INFINIUM_FIRST_HARDFORK+1;
 const Height UPGRADE_HEIGHT_V4                    = INFINIUM_FIRST_HARDFORK+4;
 const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT   = INFINIUM_FIRST_HARDFORK+2;
 const Height INFINIUM_BLOCK_REWARD_LOWERING       = INFINIUM_FIRST_HARDFORK+10;
-const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT = true; //enabled only becouse of impoting old chain, never use in normal situation 
+const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT = false; //enabled only becouse of impoting old chain, never use in normal situation 
 
 // Radical simplification of consensus rules starts from versions
 const uint8_t BLOCK_VERSION_AMETHYST       = 4;
@@ -183,7 +183,15 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {1990000, common::pfh<Hash>("8077438850060cc1e5aa30d3dba29fb352cfdf4a29a84abc080789cda0faeb61")},
     {2000000, common::pfh<Hash>("e38a98081d934c3c5ab5c8dff477a1244a250d0cfd04411d5540a8435dc1af5f")},
     {2030000, common::pfh<Hash>("6b86e80df9d8fedd58ab62aaec141f96026e49f6d5d38ac094382897feefed44")},
-    {2060000, common::pfh<Hash>("c0d0c138dee02a331fd539387370aa01c19c2c9053772e961eaac38cf1826442")}};
+    {2060000, common::pfh<Hash>("c0d0c138dee02a331fd539387370aa01c19c2c9053772e961eaac38cf1826442")},
+    {2065600, common::pfh<Hash>("30fd707ba340bd75fd4a8e6c2cc44b5067943b7fbb584c6af476fadd6cca17f7")},
+    {2065601, common::pfh<Hash>("194a895f380eb9a54f108115d6d65dd0765aa29288c624137e743368aceed782")},
+    {2065602, common::pfh<Hash>("194a895f380eb9a54f108115d6d65dd0765aa29288c624137e743368aceed782")},
+    {2065604, common::pfh<Hash>("107d76c53671f9d1d02fa3a2c9837a84aff524a1959bc9108176913c1c96a0db")},
+    {2065610, common::pfh<Hash>("94ab42d3c9c265c1e5923a31d667db02b36a18eb5f2310a58463c1814e7904e5")},
+    {2065611, common::pfh<Hash>("c06f9f64d9b86ae6283ee747f9a49921235a1a144cbc42c5794d2128a1730546")},
+    {2066800, common::pfh<Hash>("fe88ab36c46acf42cb24ad602b0dc3476cc2fb30390f9cbea751235b5991bc9e")},
+    {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 
