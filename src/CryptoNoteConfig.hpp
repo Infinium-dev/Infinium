@@ -186,7 +186,7 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2030000, common::pfh<Hash>("6b86e80df9d8fedd58ab62aaec141f96026e49f6d5d38ac094382897feefed44")},
     {2060000, common::pfh<Hash>("c0d0c138dee02a331fd539387370aa01c19c2c9053772e961eaac38cf1826442")},
     {2065600, common::pfh<Hash>("30fd707ba340bd75fd4a8e6c2cc44b5067943b7fbb584c6af476fadd6cca17f7")},
-    {2065601, common::pfh<Hash>("194a895f380eb9a54f108115d6d65dd0765aa29288c624137e743368aceed782")},
+    {2065601, common::pfh<Hash>("18a58cbd8249571dbaa2e97f97eb902628f2004b60d8acda1d491838d9da5f06")},
     {2065602, common::pfh<Hash>("194a895f380eb9a54f108115d6d65dd0765aa29288c624137e743368aceed782")},
     {2065604, common::pfh<Hash>("107d76c53671f9d1d02fa3a2c9837a84aff524a1959bc9108176913c1c96a0db")},
     {2065610, common::pfh<Hash>("94ab42d3c9c265c1e5923a31d667db02b36a18eb5f2310a58463c1814e7904e5")},
