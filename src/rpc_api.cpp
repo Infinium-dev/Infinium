@@ -10,6 +10,8 @@
 
 using namespace cn;
 
+Amount total_supply_remove_decimals = cn::parameters::MAX_SUPPLY_RPC_DIVIDE_BY;
+
 api::ErrorAddress::ErrorAddress(int c, const std::string &msg, const std::string &address)
     : json_rpc::Error(c, msg + " address=" + address), address(address) {}
 api::ErrorWrongHeight::ErrorWrongHeight(const std::string &msg, HeightOrDepth request_height, Height top_block_height)
@@ -103,7 +105,6 @@ void ser_members(api::Output &v, ISeria &s, bool only_infiniumd_fields) {
 }
 
 void ser_members(api::BlockHeader &v, ISeria &s) {
-	Amount total_supply_remove_decimals = cn::parameters::MAX_SUPPLY_RPC_DIVIDE_BY;
 	seria_kv("major_version", v.major_version, s);
 	seria_kv("minor_version", v.minor_version, s);
 	seria_kv("timestamp", v.timestamp, s);
