@@ -36,6 +36,7 @@ using namespace std::placeholders;  // We enjoy standard bindings
 typedef uint32_t Height;
 typedef uint64_t Difficulty;
 typedef uint64_t Amount;
+typedef uint64_t AmountSupply;
 typedef uint32_t Timestamp;
 typedef uint64_t BlockOrTimestamp;
 // Height or Timestamp, 32-bit is enough, but historically we already have several very large values in blockchain

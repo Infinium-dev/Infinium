@@ -49,10 +49,11 @@ const Amount MONEY_SUPPLY            = std::numeric_limits<uint64_t>::max();
 const unsigned EMISSION_SPEED_FACTOR = 18;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
-const size_t DISPLAY_DECIMAL_POINT = 12;
-const Amount MIN_DUST_THRESHOLD    = 1000000;            // Everything smaller will be split in groups of 3 digits
-const Amount MAX_DUST_THRESHOLD    = 30000000000000000;  // Everything larger is dust because very few coins
-const Amount SELF_DUST_THRESHOLD   = 1000;               // forfeit outputs smaller than this in a change
+const size_t DISPLAY_DECIMAL_POINT    = 12;
+const Amount MIN_DUST_THRESHOLD       = 1000000;            // Everything smaller will be split in groups of 3 digits
+const Amount MAX_DUST_THRESHOLD       = 30000000000000000;  // Everything larger is dust because very few coins
+const Amount SELF_DUST_THRESHOLD      = 1000;               // forfeit outputs smaller than this in a change
+const Amount MAX_SUPPLY_RPC_DIVIDE_BY = 1000;               // divide already_generated_coins rpc response from get_block_header rpc command by this number
 
 const uint64_t ADDRESS_BASE58_PREFIX          = 1288825;       // legacy addresses start with "inf8"
 const uint64_t ADDRESS_BASE58_PREFIX_AMETHYST = 88386169;  // addresses start with "infi8"
@@ -192,7 +193,8 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2065610, common::pfh<Hash>("94ab42d3c9c265c1e5923a31d667db02b36a18eb5f2310a58463c1814e7904e5")},
     {2065611, common::pfh<Hash>("c06f9f64d9b86ae6283ee747f9a49921235a1a144cbc42c5794d2128a1730546")},
     {2066800, common::pfh<Hash>("fe88ab36c46acf42cb24ad602b0dc3476cc2fb30390f9cbea751235b5991bc9e")},
-    {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")}};
+    {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")},
+    {2070700, common::pfh<Hash>("b645cd0e7f320c0552c5d0dfd7c670b39366616769d69ac580201156eda42d68")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 
