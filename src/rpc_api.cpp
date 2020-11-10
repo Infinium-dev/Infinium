@@ -6,6 +6,7 @@
 #include "Core/TransactionExtra.hpp"
 #include "common/Varint.hpp"
 #include "seria/JsonOutputStream.hpp"
+#include "CryptoNoteConfig.hpp"
 
 using namespace cn;
 
@@ -102,6 +103,8 @@ void ser_members(api::Output &v, ISeria &s, bool only_infiniumd_fields) {
 }
 
 void ser_members(api::BlockHeader &v, ISeria &s) {
+	Amount total_supply_remove_decimals = cn::parameters::MAX_SUPPLY_RPC_DIVIDE_BY;
+	Amount total_supply_api (v.already_generated_coins/total_supply_remove_decimals);
 	seria_kv("major_version", v.major_version, s);
 	seria_kv("minor_version", v.minor_version, s);
 	seria_kv("timestamp", v.timestamp, s);
@@ -125,7 +128,8 @@ void ser_members(api::BlockHeader &v, ISeria &s) {
 	seria_kv("base_reward", v.base_reward, s);
 	seria_kv("block_size", v.block_size, s);
 	seria_kv("transactions_size", v.transactions_size, s);
-	seria_kv("already_generated_coins", v.already_generated_coins, s);
+	seria_kv("already_generated_coins", total_supply_api, s);
+	seria_kv("already_generated_coins_multiply_by", total_supply_remove_decimals, s);
 	seria_kv("already_generated_transactions", v.already_generated_transactions, s);
 	seria_kv("already_generated_key_outputs", v.already_generated_key_outputs, s);
 	seria_kv("block_capacity_vote", v.block_capacity_vote, s);

@@ -112,7 +112,7 @@ struct BlockHeader {
 	size_t block_size        = 0;
 	size_t transactions_size = 0;
 
-	Amount already_generated_coins        = 0;
+	AmountSupply already_generated_coins        = 0;
 	size_t already_generated_transactions = 0;
 	size_t already_generated_key_outputs  = 0;
 	size_t size_median                    = 0;  // median of transactions_size, 0 in amethyst

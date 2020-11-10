@@ -289,7 +289,7 @@ namespace
   }
 
 Amount Currency::get_base_block_reward(
-    uint8_t block_major_version, Height height, Amount already_generated_coins, Difficulty diff) const {
+    uint8_t block_major_version, Height height, AmountSupply already_generated_coins, Difficulty diff) const {
 	/*invariant(already_generated_coins <= money_supply, "");
 	invariant(emission_speed_factor > 0 && emission_speed_factor <= 8 * sizeof(Amount), "");
 
@@ -306,7 +306,7 @@ Amount Currency::get_base_block_reward(
 }
 
 Amount Currency::get_block_reward(uint8_t block_major_version, Height height, size_t effective_median_size,
-    size_t current_transactions_size, Amount already_generated_coins, Amount fee, SignedAmount *emission_change, Difficulty diff) const {
+    size_t current_transactions_size, AmountSupply already_generated_coins, Amount fee, SignedAmount *emission_change, Difficulty diff) const {
 	Amount base_reward = get_base_block_reward(block_major_version, height, already_generated_coins, diff);
 
 	Amount penalized_base_reward = get_penalized_amount(base_reward, effective_median_size, current_transactions_size);

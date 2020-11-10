@@ -49,10 +49,11 @@ const Amount MONEY_SUPPLY            = std::numeric_limits<uint64_t>::max();
 const unsigned EMISSION_SPEED_FACTOR = 18;
 static_assert(EMISSION_SPEED_FACTOR <= 8 * sizeof(uint64_t), "Bad EMISSION_SPEED_FACTOR");
 
-const size_t DISPLAY_DECIMAL_POINT = 12;
-const Amount MIN_DUST_THRESHOLD    = 1000000;            // Everything smaller will be split in groups of 3 digits
-const Amount MAX_DUST_THRESHOLD    = 30000000000000000;  // Everything larger is dust because very few coins
-const Amount SELF_DUST_THRESHOLD   = 1000;               // forfeit outputs smaller than this in a change
+const size_t DISPLAY_DECIMAL_POINT    = 12;
+const Amount MIN_DUST_THRESHOLD       = 1000000;            // Everything smaller will be split in groups of 3 digits
+const Amount MAX_DUST_THRESHOLD       = 30000000000000000;  // Everything larger is dust because very few coins
+const Amount SELF_DUST_THRESHOLD      = 1000;               // forfeit outputs smaller than this in a change
+const Amount MAX_SUPPLY_RPC_DIVIDE_BY = 1000;               // divide already_generated_coins rpc response from get_block_header rpc command by this number
 
 const uint64_t ADDRESS_BASE58_PREFIX          = 1288825;       // legacy addresses start with "inf8"
 const uint64_t ADDRESS_BASE58_PREFIX_AMETHYST = 88386169;  // addresses start with "infi8"
