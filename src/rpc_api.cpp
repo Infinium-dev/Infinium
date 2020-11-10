@@ -104,7 +104,7 @@ void ser_members(api::Output &v, ISeria &s, bool only_infiniumd_fields) {
 
 void ser_members(api::BlockHeader &v, ISeria &s) {
 	Amount total_supply_remove_decimals = cn::parameters::MAX_SUPPLY_RPC_DIVIDE_BY;
-	Amount total_supply_api (v.already_generated_coins/total_supply_remove_decimals);
+	Amount total_supply_api = (v.already_generated_coins/total_supply_remove_decimals);
 	seria_kv("major_version", v.major_version, s);
 	seria_kv("minor_version", v.minor_version, s);
 	seria_kv("timestamp", v.timestamp, s);
