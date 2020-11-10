@@ -193,7 +193,8 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2065610, common::pfh<Hash>("94ab42d3c9c265c1e5923a31d667db02b36a18eb5f2310a58463c1814e7904e5")},
     {2065611, common::pfh<Hash>("c06f9f64d9b86ae6283ee747f9a49921235a1a144cbc42c5794d2128a1730546")},
     {2066800, common::pfh<Hash>("fe88ab36c46acf42cb24ad602b0dc3476cc2fb30390f9cbea751235b5991bc9e")},
-    {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")}};
+    {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")},
+    {2070700, common::pfh<Hash>("b645cd0e7f320c0552c5d0dfd7c670b39366616769d69ac580201156eda42d68")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 
