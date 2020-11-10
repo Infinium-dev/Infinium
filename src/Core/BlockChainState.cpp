@@ -16,6 +16,7 @@
 #include "platform/Time.hpp"
 #include "seria/BinaryInputStream.hpp"
 #include "seria/BinaryOutputStream.hpp"
+#include "CryptoNoteConfig.hpp"
 
 static const std::string KEYIMAGE_PREFIX             = "i";
 static const std::string AMOUNT_OUTPUT_PREFIX        = "a";  // amount:si -> g_index
@@ -407,19 +408,23 @@ void BlockChainState::check_standalone_consensus(
 	}
 	info->already_generated_key_outputs = prev_info.already_generated_key_outputs + key_outputs_count;
 
+	Amount divide_by = cn::parameters::MAX_SUPPLY_RPC_DIVIDE_BY;
+
 	if (is_amethyst) {
 		info->base_reward = m_currency.get_base_block_reward(
 		    block.header.major_version, info->height, prev_info.already_generated_coins, diff_for_reward);
 		info->reward                  = info->base_reward + info->transactions_fee;
-		info->already_generated_coins = prev_info.already_generated_coins + info->base_reward;
+		info->already_generated_coins = prev_info.already_generated_coins + ((info->base_reward)/divide_by);
 	} else {
 		SignedAmount emission_change = 0;
+		SignedAmount block_reward_oldV1 = 0;
 		info->base_reward            = m_currency.get_block_reward(block.header.major_version, info->height,
             info->effective_size_median, 0, prev_info.already_generated_coins, 0, &emission_change, diff_for_reward);
+		block_reward_oldV1 = info->base_reward;	
 		info->reward =
 		    m_currency.get_block_reward(block.header.major_version, info->height, info->effective_size_median,
 		        info->transactions_size, prev_info.already_generated_coins, info->transactions_fee, &emission_change, diff_for_reward);
-		info->already_generated_coins = prev_info.already_generated_coins + emission_change;
+		info->already_generated_coins = prev_info.already_generated_coins + (block_reward_oldV1/divide_by);
 	}
 
 	if (miner_reward != info->reward)
