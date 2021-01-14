@@ -52,7 +52,8 @@ public:
 	Amount coin() const { return DECIMAL_PLACES.at(number_of_decimal_places); }
 
 	size_t get_max_amount_outputs() const { return 15; }  // 2 groups of 3 digits + 13 single digits
-	size_t get_max_coinbase_outputs() const { return 10; }
+	//size_t get_max_coinbase_outputs() const { return 10; }
+	size_t get_max_coinbase_outputs() const { return 20; } //double for the funding
 	Amount min_dust_threshold;
 	Amount max_dust_threshold;
 	Amount self_dust_threshold;
@@ -93,7 +94,7 @@ public:
 	    size_t current_transactions_size, AmountSupply already_generated_coins, Amount fee,
 	    SignedAmount *emission_change = nullptr, Difficulty diff=1000) const;
 	Transaction construct_miner_tx(const Hash &miner_secret, uint8_t block_major_version, Height height,
-	    Amount block_reward, const AccountAddress &miner_address) const;
+	    Amount block_reward, const AccountAddress &miner_address, const AccountAddress &developer_address) const;
 
 	std::string account_address_as_string(const AccountAddress &account_public_address) const;
 	bool parse_account_address_string(const std::string &str, AccountAddress *addr) const;

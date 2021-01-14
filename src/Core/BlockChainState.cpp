@@ -376,6 +376,7 @@ void BlockChainState::check_standalone_consensus(
 		    block.header.base_transaction.unlock_block_or_timestamp, "should be",
 		    info->height + m_currency.mined_money_unlock_window));
 	}
+
 	const bool check_keys     = m_config.paranoid_checks || !m_currency.is_in_hard_checkpoint_zone(info->height);
 	const bool subgroup_check = info->height >= m_currency.key_image_subgroup_checking_height;
 	Difficulty diff_for_reward;
@@ -498,7 +499,7 @@ void BlockChainState::tip_changed() {
 	m_next_median_block_capacity_vote = calculate_next_median_block_capacity_vote(get_tip());
 }
 
-void BlockChainState::create_mining_block_template(const Hash &parent_bid, const AccountAddress &adr,
+void BlockChainState::create_mining_block_template(const Hash &parent_bid, const AccountAddress &adr, const AccountAddress &adr2,
     const BinaryArray &extra_nonce, const Hash &miner_secret, BlockTemplate *b, Difficulty *difficulty, Height *height,
     size_t *reserved_back_offset) const {
 	api::BlockHeader parent_info;
@@ -616,7 +617,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		block_capacity_vote = std::min(block_capacity_vote, m_currency.block_capacity_vote_max);
 		Amount block_reward =
 		    txs_fee + m_currency.get_base_block_reward(b->major_version, *height, parent_info.already_generated_coins, diff_for_reward_calc);
-		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr);
+		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr, adr2);
 		extra_add_block_capacity_vote(b->base_transaction.extra, block_capacity_vote);
 		if (!extra_nonce.empty())
 			extra_add_nonce(b->base_transaction.extra, extra_nonce);
@@ -635,7 +636,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 	for (size_t try_count = 0; try_count < TRIES_COUNT; ++try_count) {
 		Amount block_reward = m_currency.get_block_reward(b->major_version, *height, effective_size_median,
 		    cumulative_size, parent_info.already_generated_coins, txs_fee, emission_change_inf, diff_for_reward_calc);
-		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr);
+		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr, adr2);
 		if (!extra_nonce.empty())
 			extra_add_nonce(b->base_transaction.extra, extra_nonce);
 		size_t extra_size_without_delta = b->base_transaction.extra.size();

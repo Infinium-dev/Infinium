@@ -27,15 +27,25 @@ const char GENESIS_COINBASE_TX_HEX[] =
 //constexpr UUID BYTECOIN_NETWORK = common::pfh<UUID>("11100111110001011011001210110110");  // Bender's nightmare
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
-const Height INFINIUM_FIRST_HARDFORK            = 2065600;
+const Height INFINIUM_FIRST_HARDFORK                                  = 2;
 
 const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
 const Height UPGRADE_HEIGHT_V4                                         = INFINIUM_FIRST_HARDFORK+4;
+const Height UPGRADE_HEIGHT_V5                                         = 25;                        //Developer fee
 const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT                        = INFINIUM_FIRST_HARDFORK+2;
 const Height INFINIUM_BLOCK_REWARD_LOWERING                            = INFINIUM_FIRST_HARDFORK+10;
 const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = false; //enabled only becouse of impoting old chain, never use in normal situation 
 const size_t ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT = true;
+
+// Developer fee settings
+
+const size_t ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF = true;
+const Amount DEVELOPER_FEE_PERCENTILE_PER_BLOCK   = 3; // 1.5% fee to developers it is not mandatory to pay it, but it is appreciated (it is 1.5% even if there is 3,
+                                                       // becouse it is half, the fee is payed every other block to reduce stored data on the blockchain)
+const std::string DEVELOPER_FEE_WALLET_ADDRESS    = "inf8VpqmHRoMiNqbck73gwdc9UjB42AKzhmESbpn9kBoBs7sPfmYj3YGJamMbPy3HQLYiQeshbMz3go9QxJeKETw1Md7qnpchq";
+
+// Developer fee settings
 
 // Radical simplification of consensus rules starts from versions
 const uint8_t BLOCK_VERSION_AMETHYST       = 4;
@@ -160,11 +170,11 @@ const char *const SEED_NODES_STAGENET[] = {
 // testnet will have no seed nodes
 
 constexpr const HardCheckpoint CHECKPOINTS[] = {
-    {1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
-    {10, common::pfh<Hash>("1c3478922aa905eb40dd93fb0b3c06a93b47bfab4a901ffcbab51e57ff2aa0e1")},
-    {100, common::pfh<Hash>("1e96b8c578c7ce0e28928449d3cafd1dbdecfa38ab0058e5965a9a464098eaf1")},
-    {1000, common::pfh<Hash>("10cd7cefda15c4eee76710899dbafae79c9316dd36322a9cd48ddb227db4c215")},
-    {10000, common::pfh<Hash>("49e28456d2db6d771c9386feed8b5f66e77a40a1edc10bce27ae27b3fe959311")},
+    //{1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
+    //{10, common::pfh<Hash>("1c3478922aa905eb40dd93fb0b3c06a93b47bfab4a901ffcbab51e57ff2aa0e1")},
+   // {100, common::pfh<Hash>("1e96b8c578c7ce0e28928449d3cafd1dbdecfa38ab0058e5965a9a464098eaf1")},
+    //{1000, common::pfh<Hash>("10cd7cefda15c4eee76710899dbafae79c9316dd36322a9cd48ddb227db4c215")},
+   // {10000, common::pfh<Hash>("49e28456d2db6d771c9386feed8b5f66e77a40a1edc10bce27ae27b3fe959311")},
     {50000, common::pfh<Hash>("7d44bcf52ea88bf50719ce03517f61d9352986316f39ba2d1e0bbc49d4b02061")},
     {75000, common::pfh<Hash>("1bad180af3e9fcbe6889ba14fbbeb8351a35e8c2993ea098cd17cb802ee59e09")},
     {150000, common::pfh<Hash>("69234bfdc23773aed0d2c135dd875535e3d1e54b11a074ce9b702320216155e0")},

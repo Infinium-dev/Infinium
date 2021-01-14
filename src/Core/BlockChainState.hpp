@@ -71,7 +71,7 @@ public:
 	std::vector<TransactionDesc> sync_pool(
 	    const std::pair<Amount, Hash> &from, const std::pair<Amount, Hash> &to, size_t max_count) const;
 
-	void create_mining_block_template(const Hash &, const AccountAddress &, const BinaryArray &extra_nonce,
+	void create_mining_block_template(const Hash &, const AccountAddress &, const AccountAddress &, const BinaryArray &extra_nonce,
 	    const Hash &miner_secret, BlockTemplate *, Difficulty *, Height *, size_t *) const;
 	bool add_mined_block(const BinaryArray &raw_block_template, RawBlock *, api::BlockHeader *);
 
