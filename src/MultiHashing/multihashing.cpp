@@ -18,7 +18,8 @@
 #endif
 
 #include "xmrig/Mem.h"
-#include "CryptoTypes.h"
+//#include "CryptoTypes.h"
+#include "../crypto/types.hpp"
 
 #if (defined(__AES__) && (__AES__ == 1)) || (defined(__ARM_FEATURE_CRYPTO) && (__ARM_FEATURE_CRYPTO == 1))
 #define SOFT_AES false
