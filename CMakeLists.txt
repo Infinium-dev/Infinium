@@ -51,6 +51,7 @@ else()
 endif()
 include_directories(vendor/sqlite)
 include_directories(vendor/hmac)
+include_directories(src/MultiHashing/xmrig)
 set(SRC_WARNINGS_DB vendor/sqlite/sqlite3.c)
 set(SRC_DB src/platform/DBsqlite3.cpp src/platform/DBsqlite3.hpp)
 if(USE_SQLITE)
@@ -83,6 +84,9 @@ file(GLOB SRC_CRYPTO
         src/crypto/keccak/*.c
         src/crypto/oaes/*.h src/crypto/oaes/*.c
         src/crypto/skein/*.h src/crypto/skein/*.c
+)
+file(GLOB MultiHashing
+        src/MultiHashing/*
 )
 file(GLOB SRC_COMMON src/common/*.cpp src/common/*.hpp)
 file(GLOB SRC_SERIA src/seria/*.cpp src/seria/*.hpp)
@@ -165,6 +169,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/libs")
 add_library(infinium-crypto ${SRC_CRYPTO})
 add_library(infinium-core ${SOURCE_FILES})
+add_library(MultiHashing ${MultiHashing})
 target_link_libraries(infinium-core infinium-crypto ${USBLIB_LIBRARY})
 
 link_libraries(infinium-crypto infinium-core)
