@@ -72,7 +72,7 @@ public:
 	    const std::pair<Amount, Hash> &from, const std::pair<Amount, Hash> &to, size_t max_count) const;
 
 	void create_mining_block_template(const Hash &, const AccountAddress &, const AccountAddress &, const BinaryArray &extra_nonce,
-	    const Hash &miner_secret, BlockTemplate *, Difficulty *, Height *, size_t *) const;
+									  const Hash &miner_secret, BlockTemplate *, Difficulty *, Height *, size_t *, Amount mining_algorithm) const;
 	bool add_mined_block(const BinaryArray &raw_block_template, RawBlock *, api::BlockHeader *);
 
 	static api::BlockHeader fill_genesis(Hash genesis_bid, const BlockTemplate &);

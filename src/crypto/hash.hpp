@@ -8,6 +8,8 @@
 #include "hash.h"
 #include "tree-hash.h"
 #include "types.hpp"
+#include "hash-ops.h"
+#include "CryptoNoteConfig.hpp"
 
 namespace crypto {
 // Cryptonight hash functions
@@ -32,11 +34,22 @@ public:
 	void operator=(const CryptoNightContext &) = delete;
 
 	inline void cn_slow_hash(const void *src_data, size_t length, cryptoHash *hash) {
-		crypto_cn_slow_hash(data, src_data, length, hash);
+		//crypto_cn_slow_hash(data, src_data, length, hash);
+		crypto::cn_slow_hash(src_data, length, hash->data, 0, 0);
 	}
 	inline Hash cn_slow_hash(const void *src_data, size_t length) {
 		Hash hash;
-		crypto_cn_slow_hash(data, src_data, length, &hash);
+		//crypto_cn_slow_hash(data, src_data, length, &hash);
+		crypto::cn_slow_hash(src_data, length, hash.data, 0, 0);
+		return hash;
+	}
+
+	inline void cn_slow_hash2(const void *src_data, size_t length, cryptoHash *hash) {
+		crypto::cn_slow_hash(src_data, length, hash->data, cn::parameters::SECOND_MINING_ALGO, 0);
+	}
+	inline Hash cn_slow_hash2(const void *src_data, size_t length) {
+		Hash hash;
+		crypto::cn_slow_hash(src_data, length, hash.data, cn::parameters::SECOND_MINING_ALGO, 0);
 		return hash;
 	}
 	void *get_data() const { return data; }

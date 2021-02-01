@@ -5,6 +5,8 @@
 
 #include "bernstein/chacha8.h"
 
+#include "crypto/hash.hpp"
+
 static_assert(sizeof(crypto::chacha_key) == CHACHA8_KEY_SIZE && sizeof(crypto::chacha_iv) == CHACHA8_IV_SIZE,
     "Invalid structure size for chacha8");
 

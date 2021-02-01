@@ -1,6 +1,7 @@
 # IDEs/editors
 .idea/
 .vs/
+.vscode/
 xcuserdata
 *swp
 WorkspaceSettings.xcsettings

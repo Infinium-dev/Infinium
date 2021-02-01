@@ -131,13 +131,41 @@ void Node::getblocktemplate(const api::cnd::GetBlockTemplate::Request &req, api:
 	blob_reserve.resize(req.reserve_size, reserve_magic);
 	size_t reserve_back_offset = 0;
 
-	try {
+	if(req.mining_algo == 1){
+		try
+		{
+			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset,1);
+		}
+		catch (const std::exception &ex)
+		{
+			m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
+			throw;
+		}
+	}
+	else
+	{
+		try
+		{
+			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset,0);
+		}
+		catch (const std::exception &ex)
+		{
+			m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
+			throw;
+		}
+	}
+	
+	
+
+	/*try {
 		m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
 		    &block_template, &res.difficulty, &res.height, &reserve_back_offset);
 	} catch (const std::exception &ex) {
 		m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
 		throw;
-	}
+	}*/
 	BinaryArray block_blob = seria::to_binary(block_template);
 	if (req.reserve_size > 0) {
 		if (reserve_back_offset + blob_reserve.size() > block_blob.size()) {

@@ -359,6 +359,7 @@ void BlockChainState::check_standalone_consensus(
 			throw ConsensusError("CM branch invalid");
 	}
 #endif
+	printf("here 4\n");
 	if (block.header.base_transaction.inputs.size() != 1)
 		throw ConsensusError(common::to_string(
 		    "Coinbase transaction input count wrong,", block.header.base_transaction.inputs.size(), "should be 1"));
@@ -377,6 +378,8 @@ void BlockChainState::check_standalone_consensus(
 		    info->height + m_currency.mined_money_unlock_window));
 	}
 
+	printf("111");
+
 	const bool check_keys     = m_config.paranoid_checks || !m_currency.is_in_hard_checkpoint_zone(info->height);
 	const bool subgroup_check = info->height >= m_currency.key_image_subgroup_checking_height;
 	Difficulty diff_for_reward;
@@ -386,19 +389,37 @@ void BlockChainState::check_standalone_consensus(
 	{
 		std::vector<Timestamp> timestamps;
 		std::vector<CumulativeDifficulty> difficulties;
+		//For eecond POW
+		std::vector<Timestamp> second_timestamps;
+		std::vector<CumulativeDifficulty> second_difficulties;
+		//For second POW
 		const Height blocks_count = m_currency.difficulty_windows_plus_lag();
 		timestamps.reserve(blocks_count);
 		difficulties.reserve(blocks_count);
+		second_timestamps.reserve(blocks_count);
+		second_difficulties.reserve(blocks_count);
 		for_each_reversed_tip_segment(prev_info, blocks_count, false, [&](const api::BlockHeader &header) {
 			timestamps.push_back(header.timestamp);
 			difficulties.push_back(header.cumulative_difficulty);
 		});
+		for_each_reversed_tip_segment(prev_info, blocks_count, false, [&](const api::BlockHeader &header) {
+			second_timestamps.push_back(header.timestamp);
+			second_difficulties.push_back(header.second_cumulative_difficulty);
+		});
 		std::reverse(timestamps.begin(), timestamps.end());
 		std::reverse(difficulties.begin(), difficulties.end());
+		std::reverse(second_timestamps.begin(), second_timestamps.end());
+		std::reverse(second_difficulties.begin(), second_difficulties.end());
 		info->difficulty = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties);
-		diff_for_reward = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties);;
-		info->cumulative_difficulty = prev_info.cumulative_difficulty + info->difficulty;
+		info->second_difficulty =/* info->difficulty; //= */m_currency.next_effective_difficulty(block.header.major_version, second_timestamps, second_difficulties);
+		diff_for_reward = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties);
+		//info->cumulative_difficulty = prev_info.cumulative_difficulty + 1;//info->difficulty;
 	}
+
+	printf("CN/0 difficulty: " "%" PRIu64 "\n", info->difficulty);
+	//printf("CN/0 cumulative difficulty: " "%" PRIu64 "\n", info->cumulative_difficulty);
+	printf("CN/2 difficulty: " "%" PRIu64 "\n", info->second_difficulty);
+	//printf("CN/2 cumulative difficulty: " "%" PRIu64 "\n", info->second_cumulative_difficulty);
 
 	info->transactions_fee = 0;
 	for (auto &&tx : pb.block.transactions) {
@@ -428,28 +449,85 @@ void BlockChainState::check_standalone_consensus(
 		info->already_generated_coins = prev_info.already_generated_coins + (block_reward_oldV1/divide_by);
 	}
 
+	printf("here 3\n");
 	if (miner_reward != info->reward)
 		throw ConsensusError(common::to_string("Block reward mismatch,", miner_reward, "should be", info->reward));
 	info->already_generated_transactions = prev_info.already_generated_transactions + block.transactions.size() + 1;
-	if (m_currency.is_in_hard_checkpoint_zone(info->height)) {
+	if (m_currency.is_in_hard_checkpoint_zone(info->height) && cn::parameters::is_for_debuging) {
 		bool is_checkpoint;
 		if (!m_currency.check_hard_checkpoint(info->height, info->hash, is_checkpoint))
 			throw ConsensusError(
 			    common::to_string("Block does not pass through hard checkpoint at height", info->height));
 		return;
 	}
+	printf("here 2 \n");
 	if (!check_pow && !m_config.paranoid_checks)
 		return;
 	Hash long_hash = pb.long_block_hash;
+	Hash second_long_hash = pb.long_block_hash;
 	if (long_hash == Hash{}) {  // We did not calculate this long hash in parallel
 		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		long_hash = m_hash_crypto_context.cn_slow_hash(ba.data(), ba.size());
 	}
-	if (!check_hash(long_hash, info->difficulty)) {
+	if (second_long_hash == Hash{}) {  // We did not calculate this long hash in parallel
+		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
+		second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
+	}
+	if( !check_hash(long_hash, info->difficulty) && !check_hash(second_long_hash, info->second_difficulty)){
 		auto prehash = get_auxiliary_block_header_hash(block.header, body_proxy);
 		auto ba      = m_currency.get_block_long_hashing_data(block.header, body_proxy);
-		throw ConsensusError(common::to_string("Proof of work too weak long_hash=", long_hash, " prehash=", prehash,
+		throw ConsensusError(common::to_string("Proof of work too weak for both algos long_hash=", long_hash, " prehash=", prehash,
 		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));
+	}
+	// Fill timestamps and difficulty to header
+	if( check_hash(long_hash, info->difficulty) && !check_hash(second_long_hash, info->difficulty) ){
+		/*std::vector<Timestamp> timestamps;
+		std::vector<CumulativeDifficulty> difficulties;
+		const Height blocks_count = m_currency.difficulty_windows_plus_lag();
+		timestamps.reserve(blocks_count);
+		difficulties.reserve(blocks_count);
+		for_each_reversed_tip_segment(prev_info, blocks_count, false, [&](const api::BlockHeader &header) {
+			timestamps.push_back(header.timestamp);
+			difficulties.push_back(header.cumulative_difficulty);
+		});
+		std::reverse(timestamps.begin(), timestamps.end());
+		std::reverse(difficulties.begin(), difficulties.end());*/
+		info->cumulative_difficulty = prev_info.cumulative_difficulty + info->difficulty;
+	}
+	else{
+		info->cumulative_difficulty = prev_info.cumulative_difficulty + 1;
+	}
+	if (!check_hash(long_hash, info->difficulty) && check_hash(second_long_hash, info->difficulty))
+	{
+		/*std::vector<Timestamp> second_timestamps;
+		std::vector<CumulativeDifficulty> second_difficulties;
+		const Height blocks_count = m_currency.difficulty_windows_plus_lag();
+		second_timestamps.reserve(blocks_count);
+		second_difficulties.reserve(blocks_count);
+		for_each_reversed_tip_segment(prev_info, blocks_count, false, [&](const api::BlockHeader &header) {
+			second_timestamps.push_back(header.timestamp);
+			second_difficulties.push_back(header.cumulative_difficulty);
+		});
+		std::reverse(second_timestamps.begin(), second_timestamps.end());
+		std::reverse(second_difficulties.begin(), second_difficulties.end());*/
+		info->second_cumulative_difficulty = prev_info.second_cumulative_difficulty + info->second_difficulty;
+	}
+	else
+	{
+		info->second_cumulative_difficulty = prev_info.second_cumulative_difficulty + 1;
+	}
+	
+	// Fill timestamps and difficulty to header
+	printf("here \n");
+	if (!check_hash(long_hash, info->difficulty)) {
+		printf("CN/0 algo pow verification failed! \n");
+		/*throw ConsensusError(common::to_string("Proof of work too weak long_hash=", long_hash, " prehash=", prehash,
+		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));*/
+	}
+	if (!check_hash(second_long_hash, info->difficulty)) {
+		printf("Second algo pow verification failed! \n");
+		/*throw ConsensusError(common::to_string("Proof of work too weak long_hash=", long_hash, " prehash=", prehash,
+		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));*/
 	}
 }
 void BlockChainState::fill_statistics(api::cnd::GetStatistics::Response &res) const {
@@ -501,7 +579,7 @@ void BlockChainState::tip_changed() {
 
 void BlockChainState::create_mining_block_template(const Hash &parent_bid, const AccountAddress &adr, const AccountAddress &adr2,
     const BinaryArray &extra_nonce, const Hash &miner_secret, BlockTemplate *b, Difficulty *difficulty, Height *height,
-    size_t *reserved_back_offset) const {
+    size_t *reserved_back_offset, Amount mining_algorithm) const {
 	api::BlockHeader parent_info;
 	if (!get_header(parent_bid, &parent_info))
 		throw std::runtime_error("Attempt to mine from block we do not have");
@@ -518,17 +596,31 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 	{
 		std::vector<Timestamp> timestamps;
 		std::vector<CumulativeDifficulty> difficulties;
+		//For eecond POW
+		std::vector<Timestamp> second_timestamps;
+		std::vector<CumulativeDifficulty> second_difficulties;
+		//For second POW
 		const Height blocks_count = m_currency.difficulty_windows_plus_lag();
 		timestamps.reserve(blocks_count);
 		difficulties.reserve(blocks_count);
+		second_timestamps.reserve(blocks_count);
+		second_difficulties.reserve(blocks_count);
 		for_each_reversed_tip_segment(parent_info, blocks_count, false, [&](const api::BlockHeader &header) {
 			timestamps.push_back(header.timestamp);
 			difficulties.push_back(header.cumulative_difficulty);
 		});
+		for_each_reversed_tip_segment(parent_info, blocks_count, false, [&](const api::BlockHeader &header) {
+			second_timestamps.push_back(header.timestamp);
+			second_difficulties.push_back(header.second_cumulative_difficulty);
+		});
 		std::reverse(timestamps.begin(), timestamps.end());
 		std::reverse(difficulties.begin(), difficulties.end());
-		*difficulty = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties);
+		std::reverse(second_timestamps.begin(), second_timestamps.end());
+		std::reverse(second_difficulties.begin(), second_difficulties.end());
+		if(mining_algorithm==0) *difficulty = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties);
+		if(mining_algorithm==1) *difficulty = m_currency.next_effective_difficulty(b->major_version, second_timestamps, second_difficulties);
 		diff_for_reward_calc = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties);
+		//isSecondAlgo = 
 	}
 	b->nonce.resize(4);
 	if (b->is_merge_mined()) {

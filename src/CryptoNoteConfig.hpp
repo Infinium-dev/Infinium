@@ -83,6 +83,8 @@ const Height DIFFICULTY_WINDOW = 720;
 const Height DIFFICULTY_CUT    = 60;  // out-of-family timestamps to cut after sorting
 const Height DIFFICULTY_LAG    = 15;  // skip last blocks for difficulty calcs (against lowering difficulty attack)
 
+const size_t is_for_debuging   = false; // don't care about this
+
 static_assert(DIFFICULTY_WINDOW >= 2, "Bad DIFFICULTY_WINDOW");
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
 
@@ -105,6 +107,7 @@ const Height MAX_BLOCK_NUMBER = 500000000;
 
 // Legacy pre amethyst locking constants
 const Height LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
+const int    SECOND_MINING_ALGO             = 3;
 
 constexpr Timestamp LOCKED_TX_ALLOWED_DELTA_SECONDS(Timestamp difficulty_target) {
 	return difficulty_target * LOCKED_TX_ALLOWED_DELTA_BLOCKS;

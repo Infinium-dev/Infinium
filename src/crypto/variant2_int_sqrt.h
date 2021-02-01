@@ -1,7 +1,3 @@
-// Copyright (c) 2018-2019, Zelerius Developers.
-// Copyright (c) 2020-2021, The Infinium developers.
-// Licensed under the GNU Lesser General Public License. See LICENSE for details.
-
 #ifndef VARIANT2_INT_SQRT_H
 #define VARIANT2_INT_SQRT_H
 
@@ -69,22 +65,17 @@ static inline uint32_t integer_square_root_v2(uint64_t n)
 /*
 VARIANT2_INTEGER_MATH_SQRT_FIXUP checks that "r" is an integer part of "sqrt(2^64 + sqrt_input) * 2 - 2^33" and adds or subtracts 1 if needed
 It's hard to understand how it works, so here is a full calculation of formulas used in VARIANT2_INTEGER_MATH_SQRT_FIXUP
-
 The following inequalities must hold for r if it's an integer part of "sqrt(2^64 + sqrt_input) * 2 - 2^33":
 1) r <= sqrt(2^64 + sqrt_input) * 2 - 2^33
 2) r + 1 > sqrt(2^64 + sqrt_input) * 2 - 2^33
-
 We need to check them using only unsigned integer arithmetic to avoid rounding errors and undefined behavior
-
 First inequality: r <= sqrt(2^64 + sqrt_input) * 2 - 2^33
 -----------------------------------------------------------------------------------
 r <= sqrt(2^64 + sqrt_input) * 2 - 2^33
 r + 2^33 <= sqrt(2^64 + sqrt_input) * 2
 r/2 + 2^32 <= sqrt(2^64 + sqrt_input)
 (r/2 + 2^32)^2 <= 2^64 + sqrt_input
-
 Rewrite r as r = s * 2 + b (s = trunc(r/2), b is 0 or 1)
-
 ((s*2+b)/2 + 2^32)^2 <= 2^64 + sqrt_input
 (s*2+b)^2/4 + 2*2^32*(s*2+b)/2 + 2^64 <= 2^64 + sqrt_input
 (s*2+b)^2/4 + 2*2^32*(s*2+b)/2 <= sqrt_input
@@ -92,12 +83,9 @@ Rewrite r as r = s * 2 + b (s = trunc(r/2), b is 0 or 1)
 (s^2*4+2*s*2*b+b^2)/4 + 2^32*r <= sqrt_input
 s^2+s*b+b^2/4 + 2^32*r <= sqrt_input
 s*(s+b) + b^2/4 + 2^32*r <= sqrt_input
-
 Let r2 = s*(s+b) + r*2^32
 r2 + b^2/4 <= sqrt_input
-
 If this inequality doesn't hold, then we must decrement r: IF "r2 + b^2/4 > sqrt_input" THEN r = r - 1
-
 b can be 0 or 1
 If b is 0 then we need to compare "r2 > sqrt_input"
 If b is 1 then b^2/4 = 0.25, so we need to compare "r2 + 0.25 > sqrt_input"
@@ -109,15 +97,12 @@ There will be no overflow when calculating "r2 + b", so it's safe to compare wit
 r2 + b = s*(s+b) + r*2^32 + b
 The largest value s, b and r can have is s = 1779033703, b = 1, r = 3558067407 when sqrt_input = 2^64 - 1
 r2 + b <= 1779033703*1779033704 + 3558067407*2^32 + 1 = 18446744068217447385 < 2^64
-
 Second inequality: r + 1 > sqrt(2^64 + sqrt_input) * 2 - 2^33
 -----------------------------------------------------------------------------------
 r + 1 > sqrt(2^64 + sqrt_input) * 2 - 2^33
 r + 1 + 2^33 > sqrt(2^64 + sqrt_input) * 2
 ((r+1)/2 + 2^32)^2 > 2^64 + sqrt_input
-
 Rewrite r as r = s * 2 + b (s = trunc(r/2), b is 0 or 1)
-
 ((s*2+b+1)/2 + 2^32)^2 > 2^64 + sqrt_input
 (s*2+b+1)^2/4 + 2*(s*2+b+1)/2*2^32 + 2^64 > 2^64 + sqrt_input
 (s*2+b+1)^2/4 + (s*2+b+1)*2^32 > sqrt_input
@@ -126,12 +111,9 @@ Rewrite r as r = s * 2 + b (s = trunc(r/2), b is 0 or 1)
 (s^2*4+2*s*2*(b+1)+(b+1)^2)/4 + r*2^32 + 2^32 > sqrt_input
 s^2+s*(b+1)+(b+1)^2/4 + r*2^32 + 2^32 > sqrt_input
 s*(s+b) + s + (b+1)^2/4 + r*2^32 + 2^32 > sqrt_input
-
 Let r2 = s*(s+b) + r*2^32
-
 r2 + s + (b+1)^2/4 + 2^32 > sqrt_input
 r2 + 2^32 + (b+1)^2/4 > sqrt_input - s
-
 If this inequality doesn't hold, then we must decrement r: IF "r2 + 2^32 + (b+1)^2/4 <= sqrt_input - s" THEN r = r - 1
 b can be 0 or 1
 If b is 0 then we need to compare "r2 + 2^32 + 1/4 <= sqrt_input - s" which is equal to "r2 + 2^32 < sqrt_input - s" because all numbers here are integers
@@ -143,7 +125,6 @@ There will be no overflow when calculating "r2 + 2^32":
 r2 + 2^32 = s*(s+b) + r*2^32 + 2^32 = s*(s+b) + (r+1)*2^32
 The largest value s, b and r can have is s = 1779033703, b = 1, r = 3558067407 when sqrt_input = 2^64 - 1
 r2 + b <= 1779033703*1779033704 + 3558067408*2^32 = 18446744072512414680 < 2^64
-
 There will be no integer overflow when calculating "sqrt_input - s", i.e. "sqrt_input >= s" at all times:
 s = trunc(r/2) = trunc(sqrt(2^64 + sqrt_input) - 2^32) < sqrt(2^64 + sqrt_input) - 2^32 + 1
 sqrt_input > sqrt(2^64 + sqrt_input) - 2^32 + 1
