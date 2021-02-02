@@ -126,6 +126,9 @@ struct BlockHeader {
 	size_t isSecondAlgo					  = false;
 	CumulativeDifficulty second_cumulative_difficulty{};
 	Difficulty second_difficulty = 0;
+	//for third POW
+	CumulativeDifficulty third_cumulative_difficulty{};
+	Difficulty third_difficulty = 0;
 
 	// before amethyst, penalty is (base_reward + transactions_fee - reward)/(base_reward + transactions_fee)
 	// in amethyst there is no penalty

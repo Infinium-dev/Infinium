@@ -107,7 +107,9 @@ const Height MAX_BLOCK_NUMBER = 500000000;
 
 // Legacy pre amethyst locking constants
 const Height LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
-const int    SECOND_MINING_ALGO             = 3;
+
+// ADITIONAL MINING ALGO SETTINGS
+const int    SECOND_MINING_ALGO             = 2; // (CN/2)
 
 constexpr Timestamp LOCKED_TX_ALLOWED_DELTA_SECONDS(Timestamp difficulty_target) {
 	return difficulty_target * LOCKED_TX_ALLOWED_DELTA_BLOCKS;

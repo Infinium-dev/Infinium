@@ -20,6 +20,8 @@ void cn_fast_hash(const void *data, size_t length, unsigned char *hash);
 //void cn_slow_hash(void *, const void *, size_t, void *, int);
 void cn_slow_hash(const void *data, size_t length, unsigned char *hash, int variant, int prehashed);
 
+void cn_slow_hash_lite_v1(void *, const void *, size_t, void *, int, int);
+
 void tree_hash(const unsigned char (*hashes)[HASH_SIZE], size_t count, unsigned char *root_hash);
 size_t tree_depth(size_t count);
 void tree_branch(const unsigned char (*hashes)[HASH_SIZE], size_t count, unsigned char (*branch)[HASH_SIZE]);

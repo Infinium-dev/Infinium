@@ -128,6 +128,9 @@ void ser_members(api::BlockHeader &v, ISeria &s) {
 	seria_kv("second_cumulative_difficulty", v.second_cumulative_difficulty.lo, s);
 	seria_kv_optional("second_cumulative_difficulty_hi", v.second_cumulative_difficulty.hi, s);
 	seria_kv("second_difficulty", v.second_difficulty, s);
+	seria_kv("third_cumulative_difficulty", v.third_cumulative_difficulty.lo, s);
+	seria_kv_optional("third_cumulative_difficulty_hi", v.third_cumulative_difficulty.hi, s);
+	seria_kv("third_difficulty", v.third_difficulty, s);
 	seria_kv("isSecondAlgo", v.isSecondAlgo, s);
 	seria_kv("base_reward", v.base_reward, s);
 	seria_kv("block_size", v.block_size, s);

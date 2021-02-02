@@ -143,12 +143,12 @@ void Node::getblocktemplate(const api::cnd::GetBlockTemplate::Request &req, api:
 			throw;
 		}
 	}
-	else
+	else if(req.mining_algo == 2)
 	{
 		try
 		{
 			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
-													   &block_template, &res.difficulty, &res.height, &reserve_back_offset,0);
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset,2);
 		}
 		catch (const std::exception &ex)
 		{
@@ -156,8 +156,19 @@ void Node::getblocktemplate(const api::cnd::GetBlockTemplate::Request &req, api:
 			throw;
 		}
 	}
-	
-	
+	else
+	{
+		try
+		{
+			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset, 0);
+		}
+		catch (const std::exception &ex)
+		{
+			m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
+			throw;
+		}
+	}
 
 	/*try {
 		m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,

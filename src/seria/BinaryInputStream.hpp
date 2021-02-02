@@ -43,8 +43,14 @@ void from_binary(T &obj, common::MemoryInputStream &stream, Context... context) 
 	try {
 		ser(obj, ba, context...);
 	} catch (const std::exception &) {
-		std::throw_with_nested(std::runtime_error(
-		    "Error while serializing binary object of type '" + common::demangle(typeid(T).name()) + "'"));
+		if(common::demangle(typeid(T).name())=="api::BlockHeader"){
+			std::throw_with_nested(std::runtime_error(
+				"Error while serializing binary object of type '" + common::demangle(typeid(T).name()) + "'\n if you see this error while upgrading from infinium v2.0.2 to v3.0.0 this means you need to resync your blockchain, so please delete your blockchain folder"));
+		}else
+		{
+			std::throw_with_nested(std::runtime_error(
+				"Error while serializing binary object of type '" + common::demangle(typeid(T).name()) + "'"));
+		}
 	}
 	if (!stream.empty())
 		throw std::runtime_error(
