@@ -180,7 +180,7 @@ const char *const SEED_NODES_STAGENET[] = {
 // testnet will have no seed nodes
 
 constexpr const HardCheckpoint CHECKPOINTS[] = {
-   /* {1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
+    {1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
     {10, common::pfh<Hash>("1c3478922aa905eb40dd93fb0b3c06a93b47bfab4a901ffcbab51e57ff2aa0e1")},
     {100, common::pfh<Hash>("1e96b8c578c7ce0e28928449d3cafd1dbdecfa38ab0058e5965a9a464098eaf1")},
     {1000, common::pfh<Hash>("10cd7cefda15c4eee76710899dbafae79c9316dd36322a9cd48ddb227db4c215")},
@@ -192,7 +192,7 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {450000, common::pfh<Hash>("a050cbb6034ae801a28d24753ac6f9d72fd7eef2b99609c9ed98a7095609f50f")},
     {600000, common::pfh<Hash>("1931b95fe69a6cbd6dfc100945f336aaa6af094e579cec380bce41f42a80b032")},
     {750000, common::pfh<Hash>("15599ae78bf4f5adec0a29b73e0cd8927b62250c5ab7b6090b1a1343e951f3ea")},
-    {900000, common::pfh<Hash>("3f0b119b3545227f3866193786fa532376b1b6aa8ef81cd56bd0d96fec6e6159")},*/
+    {900000, common::pfh<Hash>("3f0b119b3545227f3866193786fa532376b1b6aa8ef81cd56bd0d96fec6e6159")},
     {1000000, common::pfh<Hash>("1f8176e590abf4fbec517e1722b3dda86589527d44e48a6fa7d6b15437c4d2e7")},
     {1000666, common::pfh<Hash>("f31d2bc0775a2be82d0055c97c26ccb562f2e5d641f519d61df15b3e7440e80d")},
     {1050000, common::pfh<Hash>("c50e434538a419ab36836179e985ba4f1f3869a8cfb1a91d5a4052dc72b4332a")},
