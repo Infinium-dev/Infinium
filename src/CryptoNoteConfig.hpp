@@ -43,7 +43,7 @@ const size_t ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT = true;
 const size_t ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF = true;
 const Amount DEVELOPER_FEE_PERCENTILE_PER_BLOCK   = 3; // 1.5% fee to developers it is not mandatory to pay it, but it is appreciated (it is 1.5% even if there is 3,
                                                        // becouse it is half, the fee is payed every other block to reduce stored data on the blockchain)
-const std::string DEVELOPER_FEE_WALLET_ADDRESS    = "inf8VpqmHRoMiNqbck73gwdc9UjB42AKzhmESbpn9kBoBs7sPfmYj3YGJamMbPy3HQLYiQeshbMz3go9QxJeKETw1Md7qnpchq";
+const std::string DEVELOPER_FEE_WALLET_ADDRESS    = "inf8E1MCoRbCPXy5MfLSwB3GsjmdjFrYtYRFBQLMXafR36BJyTdTTHD5ghCrJqo6yMFLt5bG8CQhu3xGaJoaH2CE3o3J2JHFoa";
 
 // Developer fee settings
 
