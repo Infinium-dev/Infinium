@@ -69,7 +69,13 @@ Currency::Currency(const std::string &net)
     , self_dust_threshold(SELF_DUST_THRESHOLD)
     , difficulty_target(std::max<Timestamp>(1,
           DIFFICULTY_TARGET / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
-    , upgrade_heights{UPGRADE_HEIGHT_V2, UPGRADE_HEIGHT_V3, UPGRADE_HEIGHT_V4}
+	, difficulty_target_cn0_v5(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CN0_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	, difficulty_target_cn2_v5(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CN2_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	, difficulty_target_cnlite_v5(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CNLITE_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+    , upgrade_heights{UPGRADE_HEIGHT_V2, UPGRADE_HEIGHT_V3, UPGRADE_HEIGHT_V4, UPGRADE_HEIGHT_V5}
     , key_image_subgroup_checking_height(KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT)
     , amethyst_block_version(BLOCK_VERSION_AMETHYST)
     , amethyst_transaction_version(TRANSACTION_VERSION_AMETHYST)
@@ -638,7 +644,8 @@ bool Currency::parse_amount(size_t number_of_decimal_places, const std::string &
 }
 
 Difficulty Currency::next_difficulty(
-    std::vector<Timestamp> *timestamps, std::vector<CumulativeDifficulty> *cumulative_difficulties) const {
+	std::vector<Timestamp> *timestamps, std::vector<CumulativeDifficulty> *cumulative_difficulties, uint8_t pow_algo, uint8_t block_major_version) const
+{
 	if (timestamps->size() > DIFFICULTY_WINDOW) {
 		timestamps->resize(DIFFICULTY_WINDOW);
 		cumulative_difficulties->resize(DIFFICULTY_WINDOW);
@@ -672,15 +679,22 @@ Difficulty Currency::next_difficulty(
 	invariant(total_work.hi == 0, "Window difficulty difference too large");
 
 	uint64_t low, high;
-	low = mul128(total_work.lo, difficulty_target, &high);
+	if(block_major_version > 4){
+		if(pow_algo==0) low = mul128(total_work.lo, difficulty_target_cn0_v5, &high);
+		if(pow_algo==1) low = mul128(total_work.lo, difficulty_target_cn2_v5, &high);
+		if(pow_algo==2) low = mul128(total_work.lo, difficulty_target_cnlite_v5, &high);
+	}else{
+		low = mul128(total_work.lo, difficulty_target, &high);
+	}
+	
 	if (high != 0 || std::numeric_limits<uint64_t>::max() - low < (time_span - 1))
 		throw std::runtime_error("Difficulty overlap");
 	return (low + time_span - 1) / time_span;
 }
 
 Difficulty Currency::next_effective_difficulty(uint8_t block_major_version, std::vector<Timestamp> timestamps,
-    std::vector<CumulativeDifficulty> cumulative_difficulties) const {
-	Difficulty difficulty = next_difficulty(&timestamps, &cumulative_difficulties);
+    std::vector<CumulativeDifficulty> cumulative_difficulties, uint8_t pow_algo) const {
+	Difficulty difficulty = next_difficulty(&timestamps, &cumulative_difficulties, pow_algo, block_major_version);
 	if (difficulty < get_minimum_difficulty(block_major_version))  // even when it is 0
 		difficulty = get_minimum_difficulty(block_major_version);
 	return difficulty;

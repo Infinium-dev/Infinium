@@ -109,7 +109,10 @@ const Height MAX_BLOCK_NUMBER = 500000000;
 const Height LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
 
 // ADITIONAL MINING ALGO SETTINGS
-const int    SECOND_MINING_ALGO             = 2; // (CN/2)
+const int    SECOND_MINING_ALGO             = 2;    // (CN/2)
+const Timestamp DIFFICULTY_TARGET_CN0_V5    = 189;  // 45% of blocks for cryptonigth v0 (asic)
+const Timestamp DIFFICULTY_TARGET_CN2_V5    = 1878; //  5% of blocks for cryptonight v8 (gpu, maybe FPGA)
+const Timestamp DIFFICULTY_TARGET_CNLITE_V5 = 189;  // 45% of blocks for cryptonight lite v7 (cpu, gpu)
 
 constexpr Timestamp LOCKED_TX_ALLOWED_DELTA_SECONDS(Timestamp difficulty_target) {
 	return difficulty_target * LOCKED_TX_ALLOWED_DELTA_BLOCKS;

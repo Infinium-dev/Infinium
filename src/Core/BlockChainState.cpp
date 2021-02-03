@@ -422,10 +422,15 @@ void BlockChainState::check_standalone_consensus(
 		std::reverse(second_difficulties.begin(), second_difficulties.end());
 		std::reverse(third_timestamps.begin(), third_timestamps.end());
 		std::reverse(third_difficulties.begin(), third_difficulties.end());
-		info->difficulty = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties);
-		info->second_difficulty =/* info->difficulty; //= */m_currency.next_effective_difficulty(block.header.major_version, second_timestamps, second_difficulties);
-		info->third_difficulty = m_currency.next_effective_difficulty(block.header.major_version, third_timestamps, third_difficulties);
-		diff_for_reward = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties); // need future fix
+		info->difficulty = m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties, 0);
+		info->second_difficulty =/* info->difficulty; //= */m_currency.next_effective_difficulty(block.header.major_version, second_timestamps, second_difficulties, 1);
+		info->third_difficulty = m_currency.next_effective_difficulty(block.header.major_version, third_timestamps, third_difficulties, 2);
+		if(block.header.major_version > 4){
+			diff_for_reward = (info->difficulty + info->second_difficulty + info->third_difficulty) / 3;
+		}else
+		{
+			diff_for_reward = info->difficulty; //m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties, 0); // need future fix
+		}
 		//info->cumulative_difficulty = prev_info.cumulative_difficulty + 1;//info->difficulty;
 	}
 
@@ -481,6 +486,15 @@ void BlockChainState::check_standalone_consensus(
 	if (long_hash == Hash{}) {  // We did not calculate this long hash in parallel
 		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		long_hash = m_hash_crypto_context.cn_slow_hash(ba.data(), ba.size());
+	}
+	if(block.header.major_version < 5){
+		if(!check_hash(long_hash, info->difficulty)){
+			auto prehash = get_auxiliary_block_header_hash(block.header, body_proxy);
+			auto ba = m_currency.get_block_long_hashing_data(block.header, body_proxy);
+			throw ConsensusError(common::to_string("Proof of work too weak for cn/0 long_hash=", long_hash, " prehash=", prehash,
+												   " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));
+			return;
+		}
 	}
 	if (second_long_hash == Hash{}) {  // We did not calculate this long hash in parallel
 		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
@@ -642,10 +656,14 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		std::reverse(second_difficulties.begin(), second_difficulties.end());
 		std::reverse(third_timestamps.begin(), third_timestamps.end());
 		std::reverse(third_difficulties.begin(), third_difficulties.end());
-		if(mining_algorithm==0) *difficulty = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties);
-		if(mining_algorithm==1) *difficulty = m_currency.next_effective_difficulty(b->major_version, second_timestamps, second_difficulties);
-		if(mining_algorithm==2) *difficulty = m_currency.next_effective_difficulty(b->major_version, third_timestamps, third_difficulties);
-		diff_for_reward_calc = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties); // need future fix
+		if(mining_algorithm==0) *difficulty = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties, 0);
+		if(mining_algorithm==1) *difficulty = m_currency.next_effective_difficulty(b->major_version, second_timestamps, second_difficulties, 1);
+		if(mining_algorithm==2) *difficulty = m_currency.next_effective_difficulty(b->major_version, third_timestamps, third_difficulties, 2);
+		if(b->major_version > 4){
+			diff_for_reward_calc = ( m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties, 0) + m_currency.next_effective_difficulty(b->major_version, second_timestamps, second_difficulties, 1) + m_currency.next_effective_difficulty(b->major_version, third_timestamps, third_difficulties, 2) ) / 3;
+		}else{
+			diff_for_reward_calc = m_currency.next_effective_difficulty(b->major_version, timestamps, difficulties,0); // need future fix
+		}
 		//isSecondAlgo = 
 	}
 	b->nonce.resize(4);
