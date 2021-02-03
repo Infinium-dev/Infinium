@@ -52,12 +52,16 @@ public:
 	Amount coin() const { return DECIMAL_PLACES.at(number_of_decimal_places); }
 
 	size_t get_max_amount_outputs() const { return 15; }  // 2 groups of 3 digits + 13 single digits
-	size_t get_max_coinbase_outputs() const { return 10; }
+	//size_t get_max_coinbase_outputs() const { return 10; }
+	size_t get_max_coinbase_outputs() const { return 20; } //double for the funding
 	Amount min_dust_threshold;
 	Amount max_dust_threshold;
 	Amount self_dust_threshold;
 
 	Timestamp difficulty_target;
+	Timestamp difficulty_target_cn0_v5;
+	Timestamp difficulty_target_cn2_v5;
+	Timestamp difficulty_target_cnlite_v5;
 	Difficulty get_minimum_difficulty(uint8_t block_major_version) const;
 	Height difficulty_windows_plus_lag() const;
 	Height expected_blocks_per_day() const;
@@ -93,7 +97,7 @@ public:
 	    size_t current_transactions_size, AmountSupply already_generated_coins, Amount fee,
 	    SignedAmount *emission_change = nullptr, Difficulty diff=1000) const;
 	Transaction construct_miner_tx(const Hash &miner_secret, uint8_t block_major_version, Height height,
-	    Amount block_reward, const AccountAddress &miner_address) const;
+	    Amount block_reward, const AccountAddress &miner_address, const AccountAddress &developer_address) const;
 
 	std::string account_address_as_string(const AccountAddress &account_public_address) const;
 	bool parse_account_address_string(const std::string &str, AccountAddress *addr) const;
@@ -105,9 +109,9 @@ public:
 	}
 
 	Difficulty next_difficulty(
-	    std::vector<Timestamp> *timestamps, std::vector<CumulativeDifficulty> *cumulative_difficulties) const;
+		std::vector<Timestamp> *timestamps, std::vector<CumulativeDifficulty> *cumulative_difficulties, uint8_t pow_algo, uint8_t block_major_version) const;
 	Difficulty next_effective_difficulty(uint8_t block_major_version, std::vector<Timestamp> timestamps,
-	    std::vector<CumulativeDifficulty> cumulative_difficulties) const;
+	    std::vector<CumulativeDifficulty> cumulative_difficulties, uint8_t pow_algo) const;
 
 	BinaryArray get_block_long_hashing_data(const BlockHeader &, const BlockBodyProxy &) const;
 

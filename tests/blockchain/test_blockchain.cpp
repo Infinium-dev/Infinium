@@ -63,7 +63,7 @@ public:
 		Height height              = 0;
 		size_t reserve_back_offset = 0;
 		block_chain.create_mining_block_template(
-		    bid, address, BinaryArray{}, Hash{}, &block, &difficulty, &height, &reserve_back_offset);
+		    bid, address, address, BinaryArray{}, Hash{}, &block, &difficulty, &height, &reserve_back_offset,0);
 		set_root_extra_to_solo_mining_tag(block);
 		block.root_block.timestamp = parent.timestamp + currency.difficulty_target;
 		block.timestamp            = block.root_block.timestamp;

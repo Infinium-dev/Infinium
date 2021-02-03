@@ -27,7 +27,8 @@ const char GENESIS_COINBASE_TX_HEX[] =
 //constexpr UUID BYTECOIN_NETWORK = common::pfh<UUID>("11100111110001011011001210110110");  // Bender's nightmare
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
-const Height INFINIUM_FIRST_HARDFORK            = 2065600;
+const Height INFINIUM_FIRST_HARDFORK                                   = 2065600;                          //First hardfork of infinium network
+const Height UPGRADE_HEIGHT_V5                                         = 9999999;                          //Developer fee & aditonal PoW hardfork
 
 const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
@@ -36,6 +37,15 @@ const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT                        = INFINIU
 const Height INFINIUM_BLOCK_REWARD_LOWERING                            = INFINIUM_FIRST_HARDFORK+10;
 const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = false; //enabled only becouse of impoting old chain, never use in normal situation 
 const size_t ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT = true;
+
+// Developer fee settings
+
+const size_t ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF = true;
+const Amount DEVELOPER_FEE_PERCENTILE_PER_BLOCK   = 3; // 1.5% fee to developers it is not mandatory to pay it, but it is appreciated (it is 1.5% even if there is 3,
+                                                       // becouse it is half, the fee is payed every other block to reduce stored data on the blockchain)
+const std::string DEVELOPER_FEE_WALLET_ADDRESS    = "inf8E1MCoRbCPXy5MfLSwB3GsjmdjFrYtYRFBQLMXafR36BJyTdTTHD5ghCrJqo6yMFLt5bG8CQhu3xGaJoaH2CE3o3J2JHFoa";
+
+// Developer fee settings
 
 // Radical simplification of consensus rules starts from versions
 const uint8_t BLOCK_VERSION_AMETHYST       = 4;
@@ -66,12 +76,15 @@ const char BLOCKINDEXES_FILENAME[] = "blockindexes.bin";
 const Timestamp DIFFICULTY_TARGET              = 90;
 const Height EXPECTED_NUMBER_OF_BLOCKS_PER_DAY = 24 * 60 * 60 / DIFFICULTY_TARGET;
 
+const Difficulty MINIMUM_DIFFICULTY_V5 = 200000; // V5 blocks
 const Difficulty MINIMUM_DIFFICULTY_V1 = 1;  // Genesis and some first blocks in main net
 const Difficulty MINIMUM_DIFFICULTY    = 200;
 
 const Height DIFFICULTY_WINDOW = 720;
 const Height DIFFICULTY_CUT    = 60;  // out-of-family timestamps to cut after sorting
 const Height DIFFICULTY_LAG    = 15;  // skip last blocks for difficulty calcs (against lowering difficulty attack)
+
+const size_t is_for_debuging   = false; // don't care about this
 
 static_assert(DIFFICULTY_WINDOW >= 2, "Bad DIFFICULTY_WINDOW");
 static_assert(2 * DIFFICULTY_CUT <= DIFFICULTY_WINDOW - 2, "Bad DIFFICULTY_WINDOW or DIFFICULTY_CUT");
@@ -95,6 +108,13 @@ const Height MAX_BLOCK_NUMBER = 500000000;
 
 // Legacy pre amethyst locking constants
 const Height LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
+
+// ADITIONAL MINING ALGO SETTINGS
+const int       SECOND_MINING_ALGO          = 2;    // (CN/2)
+const Timestamp DIFFICULTY_TARGET_CN0_V5    = 189;  // 45% of blocks for cryptonigth v0 (asic)
+const Timestamp DIFFICULTY_TARGET_CN2_V5    = 1878; //  5% of blocks for cryptonight v8 (gpu, maybe FPGA)
+const Timestamp DIFFICULTY_TARGET_CNLITE_V5 = 189;  // 45% of blocks for cryptonight lite v7 (cpu, gpu)
+const size_t    MINING_ALGO_DEBUG_STUFF     = false;// enable mining algo debuging stuff
 
 constexpr Timestamp LOCKED_TX_ALLOWED_DELTA_SECONDS(Timestamp difficulty_target) {
 	return difficulty_target * LOCKED_TX_ALLOWED_DELTA_BLOCKS;
@@ -154,7 +174,7 @@ constexpr PublicKey CHECKPOINT_PUBLIC_KEYS_STAGENET[] = {
     common::pfh<PublicKey>("62020c71bbf2447ee588b28c15430434f2ceac8443c40b6e48b627e437110981")};
 
 const char *const SEED_NODES[] = {
-    "45.80.150.33:27854", "135.181.62.60:27854", "8.210.48.142:27854", "144.217.29.34:27854"};
+    "45.80.149.111:27854", "135.181.62.60:27854", "8.210.48.142:27854", "144.217.29.34:27854"};
 const char *const SEED_NODES_STAGENET[] = {
     "207.246.127.160:10080", "108.61.174.232:10080", "45.32.156.183:10080", "45.76.29.96:10080"};
 // testnet will have no seed nodes
@@ -194,7 +214,12 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2065611, common::pfh<Hash>("c06f9f64d9b86ae6283ee747f9a49921235a1a144cbc42c5794d2128a1730546")},
     {2066800, common::pfh<Hash>("fe88ab36c46acf42cb24ad602b0dc3476cc2fb30390f9cbea751235b5991bc9e")},
     {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")},
-    {2070700, common::pfh<Hash>("b645cd0e7f320c0552c5d0dfd7c670b39366616769d69ac580201156eda42d68")}};
+    {2070700, common::pfh<Hash>("b645cd0e7f320c0552c5d0dfd7c670b39366616769d69ac580201156eda42d68")},
+    {2080800, common::pfh<Hash>("1e77407fbc322556888ced6d661200b1e2557911a46013a4cf080bf3488bbb1b")},
+    {2100000, common::pfh<Hash>("482bfbd607e12ab06c5e5192efc8f51895c821a9d557cbb3abc8a4d83d2fc2e2")},
+    {2150000, common::pfh<Hash>("072ce19602817768f5891f9da7e005af1397997a124bad3d4060aa9042d2213a")},
+    {2152000, common::pfh<Hash>("80f0e2ee7b51704939c349dc790d43c14ac979201b015cb2d8f66fadea8dca57")},
+    {2152150, common::pfh<Hash>("ce175bdd800f3b549adc231b069822599d6d871c22d46db8b7509536d41ef9fc")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 

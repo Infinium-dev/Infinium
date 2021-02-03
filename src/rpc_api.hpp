@@ -122,6 +122,14 @@ struct BlockHeader {
 	Timestamp timestamp_median            = 0;
 	Amount transactions_fee               = 0;
 
+	//for Second POW
+	size_t isSecondAlgo					  = false;
+	CumulativeDifficulty second_cumulative_difficulty{};
+	Difficulty second_difficulty = 0;
+	//for third POW
+	CumulativeDifficulty third_cumulative_difficulty{};
+	Difficulty third_difficulty = 0;
+
 	// before amethyst, penalty is (base_reward + transactions_fee - reward)/(base_reward + transactions_fee)
 	// in amethyst there is no penalty
 };
@@ -758,11 +766,13 @@ struct GetBlockTemplate {
 		Hash miner_secret;                                 // Used during testing for deterministic block generation
 		boost::optional<Hash> top_block_hash;              // for longpoll in v3 - behaves like GetStatus
 		boost::optional<size_t> transaction_pool_version;  // for longpoll in v3 - behaves like GetStatus
+		size_t mining_algo=0;
 	};
 	struct Response {
-		Difficulty difficulty  = 0;
-		Height height          = 0;
-		size_t reserved_offset = 0;
+		Difficulty difficulty        = 0;
+		Difficulty second_difficulty = 0;
+		Height height                = 0;
+		size_t reserved_offset       = 0;
 		BinaryArray blocktemplate_blob;
 		std::string status = legacy_status_ok();
 		Hash top_block_hash;                  // for longpoll in v3 - behaves like GetStatus

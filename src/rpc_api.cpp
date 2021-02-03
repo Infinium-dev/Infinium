@@ -125,6 +125,13 @@ void ser_members(api::BlockHeader &v, ISeria &s) {
 	seria_kv("cumulative_difficulty", v.cumulative_difficulty.lo, s);
 	seria_kv_optional("cumulative_difficulty_hi", v.cumulative_difficulty.hi, s);
 	seria_kv("difficulty", v.difficulty, s);
+	seria_kv("second_cumulative_difficulty", v.second_cumulative_difficulty.lo, s);
+	seria_kv_optional("second_cumulative_difficulty_hi", v.second_cumulative_difficulty.hi, s);
+	seria_kv("second_difficulty", v.second_difficulty, s);
+	seria_kv("third_cumulative_difficulty", v.third_cumulative_difficulty.lo, s);
+	seria_kv_optional("third_cumulative_difficulty_hi", v.third_cumulative_difficulty.hi, s);
+	seria_kv("third_difficulty", v.third_difficulty, s);
+	seria_kv("isSecondAlgo", v.isSecondAlgo, s);
 	seria_kv("base_reward", v.base_reward, s);
 	seria_kv("block_size", v.block_size, s);
 	seria_kv("transactions_size", v.transactions_size, s);
@@ -502,6 +509,7 @@ void ser_members(api::cnd::GetBlockTemplate::Request &v, ISeria &s) {
 	seria_kv("miner_secret", v.miner_secret, s);
 	seria_kv("top_block_hash", v.top_block_hash, s);
 	seria_kv("transaction_pool_version", v.transaction_pool_version, s);
+	seria_kv("mining_algo", v.mining_algo, s);
 }
 
 void ser_members(api::cnd::GetBlockTemplate::Response &v, ISeria &s) {

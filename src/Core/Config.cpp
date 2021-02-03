@@ -12,6 +12,7 @@
 #include "platform/PathTools.hpp"
 #include "platform/Time.hpp"
 #include "rpc_api.hpp"
+#include "BlockChainState.hpp"
 
 using namespace common;
 using namespace cn;
@@ -147,8 +148,8 @@ Config::Config(common::CommandLine &cmd)
 	parse_peer_and_add_to_container(cmd, priority_nodes, "--add-priority-node", "Use --priority-node-address instead");
 	std::vector<NetworkAddress> exclusive_nodes_list;
 	parse_peer_and_add_to_container(cmd, exclusive_nodes_list, "--exclusive-node-address");
-	parse_peer_and_add_to_container(
-	    cmd, exclusive_nodes_list, "--exclusive-node-address", "Use --exclusive-node-address instead");
+	/*parse_peer_and_add_to_container(
+	    cmd, exclusive_nodes_list, "--exclusive-node-address", "Use --exclusive-node-address instead");*/
 	if (!priority_nodes.empty() && !exclusive_nodes_list.empty())
 		throw ConfigError("Priority nodes and exclusive nodes cannot be used together");
 	if (!exclusive_nodes_list.empty()) {
@@ -174,6 +175,10 @@ Config::Config(common::CommandLine &cmd)
 	} else {
 		if (!platform::create_folders_if_necessary(data_folder))  // Create only in default place
 			throw DataFolderError("Failed to create data folder " + data_folder);
+	}
+	if (cmd.get_bool("--resync-blockchain"))
+	{
+		BlockChain::DB::delete_db(data_folder + "/blockchain");
 	}
 }
 

@@ -5,7 +5,7 @@
 
 // defines are for Windows resource compiler
 #define infinium_VERSION_WINDOWS_COMMA 3, 19, 4, 18
-#define infinium_VERSION_STRING "v2.0.2 (New Chance)"
+#define infinium_VERSION_STRING "v3.0.0 (New Way)"
 
 #ifndef RC_INVOKED  // Windows resource compiler
 

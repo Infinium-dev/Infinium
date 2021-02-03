@@ -69,7 +69,13 @@ Currency::Currency(const std::string &net)
     , self_dust_threshold(SELF_DUST_THRESHOLD)
     , difficulty_target(std::max<Timestamp>(1,
           DIFFICULTY_TARGET / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
-    , upgrade_heights{UPGRADE_HEIGHT_V2, UPGRADE_HEIGHT_V3, UPGRADE_HEIGHT_V4}
+	, difficulty_target_cn0_v5(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CN0_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	, difficulty_target_cn2_v5(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CN2_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	, difficulty_target_cnlite_v5(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CNLITE_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+    , upgrade_heights{UPGRADE_HEIGHT_V2, UPGRADE_HEIGHT_V3, UPGRADE_HEIGHT_V4, UPGRADE_HEIGHT_V5}
     , key_image_subgroup_checking_height(KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT)
     , amethyst_block_version(BLOCK_VERSION_AMETHYST)
     , amethyst_transaction_version(TRANSACTION_VERSION_AMETHYST)
@@ -217,6 +223,8 @@ uint8_t Currency::get_block_major_version_for_height(Height height) const {
 Difficulty Currency::get_minimum_difficulty(uint8_t block_major_version) const {
 	if (block_major_version == 1 || net == "test")
 		return MINIMUM_DIFFICULTY_V1;
+	if (block_major_version == 5)
+		return MINIMUM_DIFFICULTY_V5;
 	return MINIMUM_DIFFICULTY;
 }
 
@@ -325,13 +333,45 @@ Height Currency::largest_window() const {
 	            std::max(BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW, BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW_V1_3))));
 }
 
+bool isGovernanceBlock(Height specific_block_height){
+	if(specific_block_height>cn::parameters::UPGRADE_HEIGHT_V5){
+		if(specific_block_height % 10 == 0 || specific_block_height % 10 == 2 || specific_block_height % 10 == 4 || specific_block_height % 10 == 6 || specific_block_height % 10 == 8){
+        	if(cn::parameters::ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF) printf("dev fee trigerred at block:  %d\n", specific_block_height);
+			return true;
+        }
+	}
+	return false;
+}
+
 Transaction Currency::construct_miner_tx(const Hash &miner_secret, uint8_t block_major_version, Height height,
-    Amount block_reward, const AccountAddress &miner_address) const {
+    Amount block_reward, const AccountAddress &miner_address, const AccountAddress &developer_address) const {
 	Transaction tx;
 	const bool is_tx_amethyst = miner_address.type() != typeid(AccountAddressLegacy);
-	const size_t max_outs     = get_max_coinbase_outputs();
+	size_t max_outs     = get_max_coinbase_outputs(), miner_max_outs, developer_max_outs;
 	// If we wish to limit number of outputs, it makes sense to round miner reward to some arbitrary number
 	// Though this solution will reduce number of coins to mix
+
+	if(isGovernanceBlock(height)==false){
+		miner_max_outs = max_outs / 2;
+	}
+	else
+	{
+		miner_max_outs = max_outs / 2;
+		developer_max_outs = max_outs / 2;
+	}	
+
+	Amount miner_block_reward=0, developer_block_reward=0;
+
+	if(isGovernanceBlock(height)){
+		if(cn::parameters::ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF) printf("pocita se randal\r\n");
+		developer_block_reward = (block_reward/100)*cn::parameters::DEVELOPER_FEE_PERCENTILE_PER_BLOCK;
+		miner_block_reward = block_reward-developer_block_reward;
+	}
+	else
+	{
+		miner_block_reward = block_reward;
+	}
+	
 
 	tx.inputs.push_back(InputCoinbase{height});
 
@@ -343,24 +383,57 @@ Transaction Currency::construct_miner_tx(const Hash &miner_secret, uint8_t block
 	if (!is_tx_amethyst)
 		extra_add_transaction_public_key(tx.extra, txkey.public_key);
 
-	std::vector<Amount> out_amounts;
-	decompose_amount(block_reward, min_dust_threshold, &out_amounts);
+	std::vector<Amount> miner_out_amounts;
+	std::vector<Amount> developer_out_amounts;
+	decompose_amount(miner_block_reward, min_dust_threshold, &miner_out_amounts);
 
-	while (out_amounts.size() > max_outs && out_amounts.size() > 2) {
-		out_amounts.at(out_amounts.size() - 2) += out_amounts.back();
-		out_amounts.pop_back();
+	while (miner_out_amounts.size() > miner_max_outs && miner_out_amounts.size() > 2) {
+		miner_out_amounts.at(miner_out_amounts.size() - 2) += miner_out_amounts.back();
+		miner_out_amounts.pop_back();
 	}
 
+	if(isGovernanceBlock(height)){
+		if(cn::parameters::ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF) printf("Je gov blok\r\n");
+		decompose_amount(developer_block_reward, min_dust_threshold, &developer_out_amounts);
+
+		while (developer_out_amounts.size() > developer_max_outs && developer_out_amounts.size() > 2) {
+			developer_out_amounts.at(developer_out_amounts.size() - 2) += developer_out_amounts.back();
+			developer_out_amounts.pop_back();
+		}
+	}
+
+	if(cn::parameters::ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF){
+		printf("miner: %lu\r\n", miner_block_reward);
+		printf("developer: %lu\r\n", developer_block_reward);
+		printf("miner outs: %lu\r\n", miner_out_amounts.size());
+		printf("developer outs: %lu\r\n", developer_out_amounts.size());
+	}
+
+	size_t old_out_index=0;
 	Amount summary_amounts = 0;
-	for (size_t out_index = 0; out_index < out_amounts.size(); out_index++) {
+	for (size_t out_index = 0; out_index < miner_out_amounts.size(); out_index++) {
 		const Hash output_seed =
 		    miner_secret == Hash{} ? crypto::rand<Hash>()
 		                           : TransactionBuilder::generate_output_seed(tx_inputs_hash, miner_secret, out_index);
 		OutputKey tk = TransactionBuilder::create_output(
 		    is_tx_amethyst, miner_address, txkey.secret_key, tx_inputs_hash, out_index, output_seed);
-		tk.amount = out_amounts.at(out_index);
+		tk.amount = miner_out_amounts.at(out_index);
 		summary_amounts += tk.amount;
 		tx.outputs.push_back(tk);
+		old_out_index = out_index;
+	}
+
+	if(isGovernanceBlock(height)){
+		for (size_t out_index = 0; out_index < developer_out_amounts.size(); out_index++) {
+		const Hash output_seed =
+		    miner_secret == Hash{} ? crypto::rand<Hash>()
+		                           : TransactionBuilder::generate_output_seed(tx_inputs_hash, miner_secret, out_index+old_out_index);
+		OutputKey tk = TransactionBuilder::create_output(
+		    is_tx_amethyst, developer_address, txkey.secret_key, tx_inputs_hash, out_index+old_out_index, output_seed);
+		tk.amount = developer_out_amounts.at(out_index/*+old_out_index*/);
+		summary_amounts += tk.amount;
+		tx.outputs.push_back(tk);
+		}
 	}
 
 	invariant(summary_amounts == block_reward, "");
@@ -572,7 +645,8 @@ bool Currency::parse_amount(size_t number_of_decimal_places, const std::string &
 }
 
 Difficulty Currency::next_difficulty(
-    std::vector<Timestamp> *timestamps, std::vector<CumulativeDifficulty> *cumulative_difficulties) const {
+	std::vector<Timestamp> *timestamps, std::vector<CumulativeDifficulty> *cumulative_difficulties, uint8_t pow_algo, uint8_t block_major_version) const
+{
 	if (timestamps->size() > DIFFICULTY_WINDOW) {
 		timestamps->resize(DIFFICULTY_WINDOW);
 		cumulative_difficulties->resize(DIFFICULTY_WINDOW);
@@ -606,15 +680,22 @@ Difficulty Currency::next_difficulty(
 	invariant(total_work.hi == 0, "Window difficulty difference too large");
 
 	uint64_t low, high;
-	low = mul128(total_work.lo, difficulty_target, &high);
+	if(block_major_version > 4){
+		if(pow_algo==0) low = mul128(total_work.lo, difficulty_target_cn0_v5*2, &high);
+		if(pow_algo==1) low = mul128(total_work.lo, difficulty_target_cn2_v5*2, &high);
+		if(pow_algo==2) low = mul128(total_work.lo, difficulty_target_cnlite_v5*2, &high);
+	}else{
+		low = mul128(total_work.lo, difficulty_target, &high);
+	}
+	
 	if (high != 0 || std::numeric_limits<uint64_t>::max() - low < (time_span - 1))
 		throw std::runtime_error("Difficulty overlap");
 	return (low + time_span - 1) / time_span;
 }
 
 Difficulty Currency::next_effective_difficulty(uint8_t block_major_version, std::vector<Timestamp> timestamps,
-    std::vector<CumulativeDifficulty> cumulative_difficulties) const {
-	Difficulty difficulty = next_difficulty(&timestamps, &cumulative_difficulties);
+    std::vector<CumulativeDifficulty> cumulative_difficulties, uint8_t pow_algo) const {
+	Difficulty difficulty = next_difficulty(&timestamps, &cumulative_difficulties, pow_algo, block_major_version);
 	if (difficulty < get_minimum_difficulty(block_major_version))  // even when it is 0
 		difficulty = get_minimum_difficulty(block_major_version);
 	return difficulty;

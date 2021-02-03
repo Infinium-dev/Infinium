@@ -13,6 +13,7 @@
 #include "seria/BinaryOutputStream.hpp"
 #include "seria/KVBinaryInputStream.hpp"
 #include "seria/KVBinaryOutputStream.hpp"
+#include "CryptoNoteConfig.hpp"
 
 using namespace cn;
 
@@ -116,19 +117,66 @@ void Node::getblocktemplate(const api::cnd::GetBlockTemplate::Request &req, api:
 		throw api::ErrorAddress(
 		    api::ErrorAddress::ADDRESS_FAILED_TO_PARSE, "Failed to parse wallet address", req.wallet_address);
 
+	//std::string developer_wallet_address="inf8EKxfqVJF5rZXm382BpiFYEFYJfTxn1gDafTg1SerbEu6HB8raLAAzKSx5Yi5FaB1fwhBBbjjiF4bvZjEP8qS6omqbRPymz";
+	std::string developer_wallet_address = cn::parameters::DEVELOPER_FEE_WALLET_ADDRESS;
+
+	AccountAddress acc2{}; // Address for developer fee
+	if (!m_block_chain.get_currency().parse_account_address_string(developer_wallet_address, &acc2))
+		throw api::ErrorAddress(
+		    api::ErrorAddress::ADDRESS_FAILED_TO_PARSE, "Failed to parse developer wallet address", developer_wallet_address);
+
 	BlockTemplate block_template{};
 	BinaryArray blob_reserve;
 	uint8_t reserve_magic = 0xbb;
 	blob_reserve.resize(req.reserve_size, reserve_magic);
 	size_t reserve_back_offset = 0;
 
-	try {
-		m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, blob_reserve, req.miner_secret,
+	if(req.mining_algo == 1){
+		try
+		{
+			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset,1);
+		}
+		catch (const std::exception &ex)
+		{
+			m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
+			throw;
+		}
+	}
+	else if(req.mining_algo == 2)
+	{
+		try
+		{
+			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset,2);
+		}
+		catch (const std::exception &ex)
+		{
+			m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
+			throw;
+		}
+	}
+	else
+	{
+		try
+		{
+			m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
+													   &block_template, &res.difficulty, &res.height, &reserve_back_offset, 0);
+		}
+		catch (const std::exception &ex)
+		{
+			m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
+			throw;
+		}
+	}
+
+	/*try {
+		m_block_chain.create_mining_block_template(m_block_chain.get_tip_bid(), acc, acc2, blob_reserve, req.miner_secret,
 		    &block_template, &res.difficulty, &res.height, &reserve_back_offset);
 	} catch (const std::exception &ex) {
 		m_log(logging::ERROR) << logging::BrightRed << "getblocktemplate exception " << ex.what() << std::endl;
 		throw;
-	}
+	}*/
 	BinaryArray block_blob = seria::to_binary(block_template);
 	if (req.reserve_size > 0) {
 		if (reserve_back_offset + blob_reserve.size() > block_blob.size()) {

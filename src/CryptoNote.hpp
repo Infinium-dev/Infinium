@@ -120,8 +120,8 @@ struct BlockHeader {
 
 	RootBlock root_block;                                   // For block with is_merge_mined() true
 	std::vector<crypto::CMBranchElement> cm_merkle_branch;  // For blocks with is_cm_mined() true
-	bool is_cm_mined() const { return major_version == 5; }
-	bool is_merge_mined() const { return major_version == 5; }
+	bool is_cm_mined() const { return major_version > 5; }
+	bool is_merge_mined() const { return major_version > 5; }
 };
 
 struct BlockBodyProxy {
