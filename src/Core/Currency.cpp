@@ -223,6 +223,8 @@ uint8_t Currency::get_block_major_version_for_height(Height height) const {
 Difficulty Currency::get_minimum_difficulty(uint8_t block_major_version) const {
 	if (block_major_version == 1 || net == "test")
 		return MINIMUM_DIFFICULTY_V1;
+	if (block_major_version == 5)
+		return MINIMUM_DIFFICULTY_V5;
 	return MINIMUM_DIFFICULTY;
 }
 
@@ -358,11 +360,10 @@ Transaction Currency::construct_miner_tx(const Hash &miner_secret, uint8_t block
 		developer_max_outs = max_outs / 2;
 	}	
 
-	Amount miner_block_reward=0, developer_block_reward=0, DevFeeBlockPercent=0.5;
+	Amount miner_block_reward=0, developer_block_reward=0;
 
 	if(isGovernanceBlock(height)){
 		if(cn::parameters::ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF) printf("pocita se randal\r\n");
-		//developer_block_reward = block_reward*DevFeeBlockPercent;
 		developer_block_reward = (block_reward/100)*cn::parameters::DEVELOPER_FEE_PERCENTILE_PER_BLOCK;
 		miner_block_reward = block_reward-developer_block_reward;
 	}
@@ -680,9 +681,9 @@ Difficulty Currency::next_difficulty(
 
 	uint64_t low, high;
 	if(block_major_version > 4){
-		if(pow_algo==0) low = mul128(total_work.lo, difficulty_target_cn0_v5, &high);
-		if(pow_algo==1) low = mul128(total_work.lo, difficulty_target_cn2_v5, &high);
-		if(pow_algo==2) low = mul128(total_work.lo, difficulty_target_cnlite_v5, &high);
+		if(pow_algo==0) low = mul128(total_work.lo, difficulty_target_cn0_v5*2, &high);
+		if(pow_algo==1) low = mul128(total_work.lo, difficulty_target_cn2_v5*2, &high);
+		if(pow_algo==2) low = mul128(total_work.lo, difficulty_target_cnlite_v5*2, &high);
 	}else{
 		low = mul128(total_work.lo, difficulty_target, &high);
 	}

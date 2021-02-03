@@ -27,12 +27,12 @@ const char GENESIS_COINBASE_TX_HEX[] =
 //constexpr UUID BYTECOIN_NETWORK = common::pfh<UUID>("11100111110001011011001210110110");  // Bender's nightmare
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
-const Height INFINIUM_FIRST_HARDFORK                                  = 2;
+const Height INFINIUM_FIRST_HARDFORK                                   = 2065600;                          //First hardfork of infinium network
+const Height UPGRADE_HEIGHT_V5                                         = 9999999;                          //Developer fee & aditonal PoW hardfork
 
 const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
 const Height UPGRADE_HEIGHT_V4                                         = INFINIUM_FIRST_HARDFORK+4;
-const Height UPGRADE_HEIGHT_V5                                         = 25;                        //Developer fee
 const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT                        = INFINIUM_FIRST_HARDFORK+2;
 const Height INFINIUM_BLOCK_REWARD_LOWERING                            = INFINIUM_FIRST_HARDFORK+10;
 const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = false; //enabled only becouse of impoting old chain, never use in normal situation 
@@ -76,6 +76,7 @@ const char BLOCKINDEXES_FILENAME[] = "blockindexes.bin";
 const Timestamp DIFFICULTY_TARGET              = 90;
 const Height EXPECTED_NUMBER_OF_BLOCKS_PER_DAY = 24 * 60 * 60 / DIFFICULTY_TARGET;
 
+const Difficulty MINIMUM_DIFFICULTY_V5 = 200000; // V5 blocks
 const Difficulty MINIMUM_DIFFICULTY_V1 = 1;  // Genesis and some first blocks in main net
 const Difficulty MINIMUM_DIFFICULTY    = 200;
 
@@ -109,10 +110,11 @@ const Height MAX_BLOCK_NUMBER = 500000000;
 const Height LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
 
 // ADITIONAL MINING ALGO SETTINGS
-const int    SECOND_MINING_ALGO             = 2;    // (CN/2)
+const int       SECOND_MINING_ALGO          = 2;    // (CN/2)
 const Timestamp DIFFICULTY_TARGET_CN0_V5    = 189;  // 45% of blocks for cryptonigth v0 (asic)
 const Timestamp DIFFICULTY_TARGET_CN2_V5    = 1878; //  5% of blocks for cryptonight v8 (gpu, maybe FPGA)
 const Timestamp DIFFICULTY_TARGET_CNLITE_V5 = 189;  // 45% of blocks for cryptonight lite v7 (cpu, gpu)
+const size_t    MINING_ALGO_DEBUG_STUFF     = false;// enable mining algo debuging stuff
 
 constexpr Timestamp LOCKED_TX_ALLOWED_DELTA_SECONDS(Timestamp difficulty_target) {
 	return difficulty_target * LOCKED_TX_ALLOWED_DELTA_BLOCKS;
@@ -172,17 +174,17 @@ constexpr PublicKey CHECKPOINT_PUBLIC_KEYS_STAGENET[] = {
     common::pfh<PublicKey>("62020c71bbf2447ee588b28c15430434f2ceac8443c40b6e48b627e437110981")};
 
 const char *const SEED_NODES[] = {
-    "45.80.150.33:27854", "135.181.62.60:27854", "8.210.48.142:27854", "144.217.29.34:27854"};
+    "45.80.149.111:27854", "135.181.62.60:27854", "8.210.48.142:27854", "144.217.29.34:27854"};
 const char *const SEED_NODES_STAGENET[] = {
     "207.246.127.160:10080", "108.61.174.232:10080", "45.32.156.183:10080", "45.76.29.96:10080"};
 // testnet will have no seed nodes
 
 constexpr const HardCheckpoint CHECKPOINTS[] = {
-    //{1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
-    //{10, common::pfh<Hash>("1c3478922aa905eb40dd93fb0b3c06a93b47bfab4a901ffcbab51e57ff2aa0e1")},
-   // {100, common::pfh<Hash>("1e96b8c578c7ce0e28928449d3cafd1dbdecfa38ab0058e5965a9a464098eaf1")},
-    //{1000, common::pfh<Hash>("10cd7cefda15c4eee76710899dbafae79c9316dd36322a9cd48ddb227db4c215")},
-   // {10000, common::pfh<Hash>("49e28456d2db6d771c9386feed8b5f66e77a40a1edc10bce27ae27b3fe959311")},
+   /* {1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
+    {10, common::pfh<Hash>("1c3478922aa905eb40dd93fb0b3c06a93b47bfab4a901ffcbab51e57ff2aa0e1")},
+    {100, common::pfh<Hash>("1e96b8c578c7ce0e28928449d3cafd1dbdecfa38ab0058e5965a9a464098eaf1")},
+    {1000, common::pfh<Hash>("10cd7cefda15c4eee76710899dbafae79c9316dd36322a9cd48ddb227db4c215")},
+    {10000, common::pfh<Hash>("49e28456d2db6d771c9386feed8b5f66e77a40a1edc10bce27ae27b3fe959311")},
     {50000, common::pfh<Hash>("7d44bcf52ea88bf50719ce03517f61d9352986316f39ba2d1e0bbc49d4b02061")},
     {75000, common::pfh<Hash>("1bad180af3e9fcbe6889ba14fbbeb8351a35e8c2993ea098cd17cb802ee59e09")},
     {150000, common::pfh<Hash>("69234bfdc23773aed0d2c135dd875535e3d1e54b11a074ce9b702320216155e0")},
@@ -190,7 +192,7 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {450000, common::pfh<Hash>("a050cbb6034ae801a28d24753ac6f9d72fd7eef2b99609c9ed98a7095609f50f")},
     {600000, common::pfh<Hash>("1931b95fe69a6cbd6dfc100945f336aaa6af094e579cec380bce41f42a80b032")},
     {750000, common::pfh<Hash>("15599ae78bf4f5adec0a29b73e0cd8927b62250c5ab7b6090b1a1343e951f3ea")},
-    {900000, common::pfh<Hash>("3f0b119b3545227f3866193786fa532376b1b6aa8ef81cd56bd0d96fec6e6159")},
+    {900000, common::pfh<Hash>("3f0b119b3545227f3866193786fa532376b1b6aa8ef81cd56bd0d96fec6e6159")},*/
     {1000000, common::pfh<Hash>("1f8176e590abf4fbec517e1722b3dda86589527d44e48a6fa7d6b15437c4d2e7")},
     {1000666, common::pfh<Hash>("f31d2bc0775a2be82d0055c97c26ccb562f2e5d641f519d61df15b3e7440e80d")},
     {1050000, common::pfh<Hash>("c50e434538a419ab36836179e985ba4f1f3869a8cfb1a91d5a4052dc72b4332a")},
@@ -212,7 +214,12 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2065611, common::pfh<Hash>("c06f9f64d9b86ae6283ee747f9a49921235a1a144cbc42c5794d2128a1730546")},
     {2066800, common::pfh<Hash>("fe88ab36c46acf42cb24ad602b0dc3476cc2fb30390f9cbea751235b5991bc9e")},
     {2066804, common::pfh<Hash>("0b7ac9b50c9413c2bc0e69fd67077436054a6481525a636b758456aa83c73878")},
-    {2070700, common::pfh<Hash>("b645cd0e7f320c0552c5d0dfd7c670b39366616769d69ac580201156eda42d68")}};
+    {2070700, common::pfh<Hash>("b645cd0e7f320c0552c5d0dfd7c670b39366616769d69ac580201156eda42d68")},
+    {2080800, common::pfh<Hash>("1e77407fbc322556888ced6d661200b1e2557911a46013a4cf080bf3488bbb1b")},
+    {2100000, common::pfh<Hash>("482bfbd607e12ab06c5e5192efc8f51895c821a9d557cbb3abc8a4d83d2fc2e2")},
+    {2150000, common::pfh<Hash>("072ce19602817768f5891f9da7e005af1397997a124bad3d4060aa9042d2213a")},
+    {2152000, common::pfh<Hash>("80f0e2ee7b51704939c349dc790d43c14ac979201b015cb2d8f66fadea8dca57")},
+    {2152150, common::pfh<Hash>("ce175bdd800f3b549adc231b069822599d6d871c22d46db8b7509536d41ef9fc")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 

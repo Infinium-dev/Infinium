@@ -240,7 +240,7 @@ BlockChainState::BlockChainState(logging::ILogger &log, const Config &config, co
 	}
 	BlockChainState::tip_changed();
 	m_log(logging::INFO) << "BlockChainState::BlockChainState height=" << get_tip_height()
-	                     << " cumulative_difficulty=" << get_tip_cumulative_difficulty() << " bid=" << get_tip_bid()
+	                     << "cn/0 cumulative_difficulty=" << get_tip_cumulative_difficulty() << " bid=" << get_tip_bid()
 	                     << std::endl;
 	build_blods();
 	DB::Cursor cur2 = m_db.rbegin(DIN_PREFIX);
@@ -359,7 +359,7 @@ void BlockChainState::check_standalone_consensus(
 			throw ConsensusError("CM branch invalid");
 	}
 #endif
-	printf("here 4\n");
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("here 4\n");
 	if (block.header.base_transaction.inputs.size() != 1)
 		throw ConsensusError(common::to_string(
 		    "Coinbase transaction input count wrong,", block.header.base_transaction.inputs.size(), "should be 1"));
@@ -378,7 +378,7 @@ void BlockChainState::check_standalone_consensus(
 		    info->height + m_currency.mined_money_unlock_window));
 	}
 
-	printf("111");
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("here 3,5\n");
 
 	const bool check_keys     = m_config.paranoid_checks || !m_currency.is_in_hard_checkpoint_zone(info->height);
 	const bool subgroup_check = info->height >= m_currency.key_image_subgroup_checking_height;
@@ -434,9 +434,9 @@ void BlockChainState::check_standalone_consensus(
 		//info->cumulative_difficulty = prev_info.cumulative_difficulty + 1;//info->difficulty;
 	}
 
-	printf("CN/0 difficulty      : " "%" PRIu64 "\n", info->difficulty);
-	printf("CN/2 difficulty      : " "%" PRIu64 "\n", info->second_difficulty);
-	printf("CN/LITE v7 difficulty: " "%" PRIu64 "\n", info->third_difficulty);
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/0 difficulty      : " "%" PRIu64 "\n", info->difficulty);
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/2 difficulty      : " "%" PRIu64 "\n", info->second_difficulty);
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/LITE v7 difficulty: " "%" PRIu64 "\n", info->third_difficulty);
 
 	info->transactions_fee = 0;
 	for (auto &&tx : pb.block.transactions) {
@@ -466,7 +466,7 @@ void BlockChainState::check_standalone_consensus(
 		info->already_generated_coins = prev_info.already_generated_coins + (block_reward_oldV1/divide_by);
 	}
 
-	printf("here 3\n");
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("here 3\n");
 	if (miner_reward != info->reward)
 		throw ConsensusError(common::to_string("Block reward mismatch,", miner_reward, "should be", info->reward));
 	info->already_generated_transactions = prev_info.already_generated_transactions + block.transactions.size() + 1;
@@ -477,7 +477,7 @@ void BlockChainState::check_standalone_consensus(
 			    common::to_string("Block does not pass through hard checkpoint at height", info->height));
 		return;
 	}
-	printf("here 2 \n");
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("here 2 \n");
 	if (!check_pow && !m_config.paranoid_checks)
 		return;
 	Hash long_hash = pb.long_block_hash;
@@ -540,6 +540,7 @@ void BlockChainState::check_standalone_consensus(
 	}
 
 	// Fill timestamps and difficulty to header
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) {
 	printf("here \n");
 	if (!check_hash(long_hash, info->difficulty)) {
 		printf("CN/0 algo pow verification failed! \n");
@@ -555,6 +556,7 @@ void BlockChainState::check_standalone_consensus(
 		printf("CN/LITE v7 algo pow verification failed! \n");
 		/*throw ConsensusError(common::to_string("Proof of work too weak long_hash=", long_hash, " prehash=", prehash,
 		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));*/
+	}
 	}
 }
 void BlockChainState::fill_statistics(api::cnd::GetStatistics::Response &res) const {

@@ -36,7 +36,8 @@ Options:
   --net=<main|stage|test>                Configure for mainnet or testnet [default: main].
   --archive                              Work as an archive node [default: off].
   --data-folder=<folder-path>            Folder for blockchain, logs and peer DB [default: )" platform_DEFAULT_DATA_FOLDER_PATH_PREFIX
-                            R"(bytecoin].
+							R"(bytecoin].
+  --resync-blockchain					 Deletes blockchain in data directory and start syncing from scratch
   --bytecoind-authorization=<usr:pass>   HTTP basic authentication credentials for RPC API.
   --bytecoind-authorization-private=<usr:pass>   HTTP basic authentication credentials for get_statistics and get_archive methods.)";
 
@@ -137,7 +138,7 @@ int main(int argc, const char *argv[]) try {
 
 	auto idea_ms =
 	    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - idea_start);
-	std::cout << "bytecoind started seconds=" << double(idea_ms.count()) / 1000 << std::endl;
+	std::cout << "Infiniumd started seconds=" << double(idea_ms.count()) / 1000 << std::endl;
 	while (!io.stopped()) {
 		if (node.on_idle())  // Using it to load blockchain
 			io.poll();
@@ -146,7 +147,7 @@ int main(int argc, const char *argv[]) try {
 	}
 	return 0;
 } catch (const platform::ExclusiveLock::FailedToLock &ex) {
-	std::cout << "Bytecoind already running - " << common::what(ex) << std::endl;
+	std::cout << "Infiniumd already running - " << common::what(ex) << std::endl;
 	return api::BYTECOIND_ALREADY_RUNNING;
 } catch (const cn::Config::DataFolderError &ex) {
 	std::cout << common::what(ex) << std::endl;
