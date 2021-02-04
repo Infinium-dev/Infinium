@@ -289,7 +289,7 @@ void BlockChainState::check_standalone_consensus(
 	for (size_t i = 0; i != pb.raw_block.transactions.size(); ++i)
 		cumulative_size += pb.raw_block.transactions.at(i).size();
 	if (is_amethyst && block.header.major_version < 5) {  // We care only about single limit - block size
-		if (!extra_get_block_capacity_vote(block.header.base_transaction.n_extra, &info->block_capacity_vote))
+		if (!extra_get_block_capacity_vote(block.header.base_transaction.extra, &info->block_capacity_vote))
 			throw ConsensusError("No block capacity vote");
 		if (info->block_capacity_vote < m_currency.block_capacity_vote_min ||
 		    info->block_capacity_vote > m_currency.block_capacity_vote_max)
@@ -763,9 +763,14 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 			b->base_transaction.n_extra = b->base_transaction.extra;
 			extra_add_block_capacity_vote(b->base_transaction.n_extra, block_capacity_vote);
 		}
+		else
+		{
+			extra_add_block_capacity_vote(b->base_transaction.extra, block_capacity_vote);
+		}
+		
 		if (!extra_nonce.empty()){
 			extra_add_nonce(b->base_transaction.extra, extra_nonce);
-			if(b->major_version > 4) extra_add_nonce(b->base_transaction.n_extra, extra_nonce);
+			if(b->major_version < 5) extra_add_nonce(b->base_transaction.extra, extra_nonce);
 		}
 		*reserved_back_offset =
 		    common::get_varint_data(b->transaction_hashes.size()).size() + sizeof(Hash) * b->transaction_hashes.size();
