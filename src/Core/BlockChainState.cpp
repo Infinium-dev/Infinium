@@ -288,8 +288,8 @@ void BlockChainState::check_standalone_consensus(
 	size_t cumulative_size = 0;
 	for (size_t i = 0; i != pb.raw_block.transactions.size(); ++i)
 		cumulative_size += pb.raw_block.transactions.at(i).size();
-	if (is_amethyst) {  // We care only about single limit - block size
-		if (!extra_get_block_capacity_vote(block.header.base_transaction.extra, &info->block_capacity_vote))
+	if (is_amethyst && block.header.major_version < 5) {  // We care only about single limit - block size
+		if (!extra_get_block_capacity_vote(block.header.base_transaction.n_extra, &info->block_capacity_vote))
 			throw ConsensusError("No block capacity vote");
 		if (info->block_capacity_vote < m_currency.block_capacity_vote_min ||
 		    info->block_capacity_vote > m_currency.block_capacity_vote_max)
@@ -609,6 +609,7 @@ void BlockChainState::tip_changed() {
 void BlockChainState::create_mining_block_template(const Hash &parent_bid, const AccountAddress &adr, const AccountAddress &adr2,
     const BinaryArray &extra_nonce, const Hash &miner_secret, BlockTemplate *b, Difficulty *difficulty, Height *height,
     size_t *reserved_back_offset, Amount mining_algorithm) const {
+
 	api::BlockHeader parent_info;
 	if (!get_header(parent_bid, &parent_info))
 		throw std::runtime_error("Attempt to mine from block we do not have");
@@ -619,7 +620,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 	if (!fill_next_block_versions(parent_info, &b->major_version, &major_version_cm))
 		throw std::runtime_error(
 		    "Mining of block in chain not passing through last hard checkpoint is not possible (will not be accepted by network anyway)");
-	const bool is_amethyst = b->major_version >= m_currency.amethyst_block_version;
+	const bool is_amethyst = b->major_version >= m_currency.amethyst_block_version; //!!! here
 	Difficulty diff_for_reward_calc;
 	clear_mining_transactions();  // We periodically forget transactions for old blocks we gave as templates
 	{
@@ -678,6 +679,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 
 		extra_add_merge_mining_tag(b->root_block.base_transaction.extra, TransactionExtraMergeMiningTag{});
 	}
+
 
 	b->previous_block_hash                = parent_bid;
 	const Timestamp next_median_timestamp = calculate_next_median_timestamp(parent_info);
@@ -756,9 +758,15 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		Amount block_reward =
 		    txs_fee + m_currency.get_base_block_reward(b->major_version, *height, parent_info.already_generated_coins, diff_for_reward_calc);
 		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr, adr2);
-		extra_add_block_capacity_vote(b->base_transaction.extra, block_capacity_vote);
-		if (!extra_nonce.empty())
+
+		if(b->major_version > 4){ 
+			b->base_transaction.n_extra = b->base_transaction.extra;
+			extra_add_block_capacity_vote(b->base_transaction.n_extra, block_capacity_vote);
+		}
+		if (!extra_nonce.empty()){
 			extra_add_nonce(b->base_transaction.extra, extra_nonce);
+			if(b->major_version > 4) extra_add_nonce(b->base_transaction.n_extra, extra_nonce);
+		}
 		*reserved_back_offset =
 		    common::get_varint_data(b->transaction_hashes.size()).size() + sizeof(Hash) * b->transaction_hashes.size();
 		return;
@@ -777,6 +785,8 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		b->base_transaction = m_currency.construct_miner_tx(miner_secret, b->major_version, *height, block_reward, adr, adr2);
 		if (!extra_nonce.empty())
 			extra_add_nonce(b->base_transaction.extra, extra_nonce);
+		if (!extra_nonce.empty())
+			extra_add_nonce(b->base_transaction.n_extra, extra_nonce);
 		size_t extra_size_without_delta = b->base_transaction.extra.size();
 		size_t coinbase_blob_size       = seria::binary_size(b->base_transaction);
 		if (coinbase_blob_size + txs_size > cumulative_size) {
@@ -786,6 +796,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 		if (coinbase_blob_size + txs_size < cumulative_size) {
 			size_t delta = cumulative_size - (coinbase_blob_size + txs_size);
 			common::append(b->base_transaction.extra, delta, 0);
+			common::append(b->base_transaction.n_extra, delta, 0);
 			// here could be 1 byte difference, because of extra field counter is
 			// varint, and it can become from
 			// 1-byte len to 2-bytes len.
@@ -802,8 +813,8 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 					continue;
 				}
 				m_log(logging::TRACE) << logging::BrightGreen
-				                      << "Setting extra for block: " << b->base_transaction.extra.size()
-				                      << ", try_count=" << try_count;
+									  << "Setting extra for block: " << b->base_transaction.extra.size()
+									  << ", try_count=" << try_count;
 			}
 		}
 		*reserved_back_offset =

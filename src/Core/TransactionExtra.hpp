@@ -24,7 +24,7 @@ struct TransactionExtraPublicKey {
 
 struct TransactionExtraNonce {
 	BinaryArray nonce;
-	enum { tag = 0x02, MAX_COUNT = 127, PAYMENT_ID = 0x00 };
+	enum { tag = 0x02, MAX_COUNT = /*127*/255, PAYMENT_ID = 0x00 };
 	// We limit MAX_COUNT so that single byte (former) is equal to varint encoding (now)
 };
 

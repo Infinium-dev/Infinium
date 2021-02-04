@@ -80,6 +80,7 @@ struct TransactionPrefix {
 	std::vector<TransactionInput> inputs;
 	std::vector<TransactionOutput> outputs;
 	BinaryArray extra;
+	BinaryArray n_extra;
 };
 
 struct RingSignatures {
