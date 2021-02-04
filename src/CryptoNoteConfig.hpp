@@ -28,7 +28,7 @@ const char GENESIS_COINBASE_TX_HEX[] =
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
 const Height INFINIUM_FIRST_HARDFORK                                   = 2065600;                          //First hardfork of infinium network
-const Height UPGRADE_HEIGHT_V5                                         = 9999999;                          //Developer fee & aditonal PoW hardfork
+const Height UPGRADE_HEIGHT_V5                                         = 2159750;                          //Developer fee & aditonal PoW hardfork
 
 const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
@@ -181,6 +181,7 @@ const char *const SEED_NODES_STAGENET[] = {
 
 constexpr const HardCheckpoint CHECKPOINTS[] = {
     {1, common::pfh<Hash>("1a3599e86f1f42132eedfc4a8ef94f0d3f4e2a081b2d624dc2bf3abb7e3f691d")},
+    {5, common::pfh<Hash>("c8272e56e92eac7bd88ef395ea75a52d1243a9b1bebd12fd2de4ce1566d3e793")},
     {10, common::pfh<Hash>("1c3478922aa905eb40dd93fb0b3c06a93b47bfab4a901ffcbab51e57ff2aa0e1")},
     {100, common::pfh<Hash>("1e96b8c578c7ce0e28928449d3cafd1dbdecfa38ab0058e5965a9a464098eaf1")},
     {1000, common::pfh<Hash>("10cd7cefda15c4eee76710899dbafae79c9316dd36322a9cd48ddb227db4c215")},
