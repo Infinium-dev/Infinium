@@ -427,11 +427,17 @@ void BlockChainState::check_standalone_consensus(
 		info->third_difficulty = m_currency.next_effective_difficulty(block.header.major_version, third_timestamps, third_difficulties, 2);
 		if(block.header.major_version > 4){
 			diff_for_reward = (info->difficulty + info->second_difficulty + info->third_difficulty) / 3;
+			//printf("lol2\n");
 		}else
 		{
+			//printf("lol1\n");
 			diff_for_reward = info->difficulty; //m_currency.next_effective_difficulty(block.header.major_version, timestamps, difficulties, 0); // need future fix
 		}
-		//info->cumulative_difficulty = prev_info.cumulative_difficulty + 1;//info->difficulty;
+		if(block.header.major_version < 5){
+			info->cumulative_difficulty = prev_info.cumulative_difficulty + info->difficulty;
+			info->second_cumulative_difficulty = prev_info.second_cumulative_difficulty + 1;
+			info->third_cumulative_difficulty = prev_info.third_cumulative_difficulty + 1;
+		}
 	}
 
 	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/0 difficulty      : " "%" PRIu64 "\n", info->difficulty);
@@ -493,9 +499,13 @@ void BlockChainState::check_standalone_consensus(
 			auto ba = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 			throw ConsensusError(common::to_string("Proof of work too weak for cn/0 long_hash=", long_hash, " prehash=", prehash,
 												   " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));
-			return;
 		}
-	}
+		else
+		{
+			//info->cumulative_difficulty = prev_info.cumulative_difficulty + info->difficulty;
+		}
+		
+	}else{
 	if (second_long_hash == Hash{}) {  // We did not calculate this long hash in parallel
 		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		//second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
@@ -556,6 +566,7 @@ void BlockChainState::check_standalone_consensus(
 		printf("CN/LITE v7 algo pow verification failed! \n");
 		/*throw ConsensusError(common::to_string("Proof of work too weak long_hash=", long_hash, " prehash=", prehash,
 		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));*/
+	}
 	}
 	}
 }
