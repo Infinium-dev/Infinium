@@ -325,7 +325,7 @@ void BlockChainState::check_standalone_consensus(
 		if (info->transactions_size > max_transactions_cumulative_size)
 			throw ConsensusError(common::to_string("Cumulative block transactions size too big_1,",
 			    info->transactions_size, "should be <=", max_transactions_cumulative_size));
-		if (info->transactions_size > info->effective_size_median * 2 && info->transactions_size > 300000)
+		if (info->transactions_size > info->effective_size_median * 2 && info->transactions_size > 5000000)
 			throw ConsensusError(common::to_string("Cumulative block transactions size too big_2,",
 			    info->transactions_size, "should be <=", info->effective_size_median * 2));
 		if (block.header.is_merge_mined() && pb.parent_block_size > m_currency.max_header_size)
