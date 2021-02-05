@@ -325,7 +325,7 @@ void BlockChainState::check_standalone_consensus(
 		if (info->transactions_size > max_transactions_cumulative_size)
 			throw ConsensusError(common::to_string("Cumulative block transactions size too big_1,",
 			    info->transactions_size, "should be <=", max_transactions_cumulative_size));
-		if (info->transactions_size > info->effective_size_median * 2)
+		if (info->transactions_size > info->effective_size_median * 2 && info->transactions_size > 5000000)
 			throw ConsensusError(common::to_string("Cumulative block transactions size too big_2,",
 			    info->transactions_size, "should be <=", info->effective_size_median * 2));
 		if (block.header.is_merge_mined() && pb.parent_block_size > m_currency.max_header_size)
@@ -703,7 +703,7 @@ void BlockChainState::create_mining_block_template(const Hash &parent_bid, const
 	size_t max_txs_size          = 0;
 	size_t effective_size_median = 0;
 
-	if (is_amethyst) {
+	if (is_amethyst && b->major_version < 5) {
 		const size_t next_median_block_capacity_vote = calculate_next_median_block_capacity_vote(parent_info);
 		max_txs_size = next_median_block_capacity_vote - m_currency.miner_tx_blob_reserved_size - extra_nonce.size();
 	} else {

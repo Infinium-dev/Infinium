@@ -237,6 +237,8 @@ size_t Currency::get_minimum_size_median(uint8_t block_major_version) const {
 		return MINIMUM_SIZE_MEDIAN_V2;
 	if (block_major_version == 3)
 		return MINIMUM_SIZE_MEDIAN_V3;
+	if (block_major_version == 5)
+		return MINIMUM_SIZE_MEDIAN_V5;
 	return 0;
 }
 
