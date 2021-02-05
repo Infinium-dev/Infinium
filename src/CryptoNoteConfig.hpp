@@ -27,8 +27,8 @@ const char GENESIS_COINBASE_TX_HEX[] =
 //constexpr UUID BYTECOIN_NETWORK = common::pfh<UUID>("11100111110001011011001210110110");  // Bender's nightmare
 constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78, 0x51, 0x14, 0xAA, 0x30, 0x12, 0x19, 0x31, 0x21, 0x16} };
 
-const Height INFINIUM_FIRST_HARDFORK                                   = 2;//2065600;                          //First hardfork of infinium network
-const Height UPGRADE_HEIGHT_V5                                         = 25;//2159750;                          //Developer fee & aditonal PoW hardfork
+const Height INFINIUM_FIRST_HARDFORK                                   = 2065600;                          //First hardfork of infinium network
+const Height UPGRADE_HEIGHT_V5                                         = 2159750;                          //Developer fee & aditonal PoW hardfork
 
 const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
