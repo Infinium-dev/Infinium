@@ -35,7 +35,7 @@ const Height UPGRADE_HEIGHT_V3                                         = INFINIU
 const Height UPGRADE_HEIGHT_V4                                         = INFINIUM_FIRST_HARDFORK+4;
 const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT                        = INFINIUM_FIRST_HARDFORK+2;
 const Height INFINIUM_BLOCK_REWARD_LOWERING                            = INFINIUM_FIRST_HARDFORK+10;
-const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = false; //enabled only becouse of impoting old chain, never use in normal situation 
+const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = true; //enabled only becouse of impoting old chain, never use in normal situation 
 const size_t ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT = true;
 
 // Developer fee settings
