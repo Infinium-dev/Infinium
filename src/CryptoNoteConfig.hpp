@@ -35,7 +35,7 @@ const Height UPGRADE_HEIGHT_V3                                         = INFINIU
 const Height UPGRADE_HEIGHT_V4                                         = INFINIUM_FIRST_HARDFORK+4;
 const Height KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT                        = INFINIUM_FIRST_HARDFORK+2;
 const Height INFINIUM_BLOCK_REWARD_LOWERING                            = INFINIUM_FIRST_HARDFORK+10;
-const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = true; //enabled only becouse of impoting old chain, never use in normal situation 
+const size_t DISABLE_VERSION_CHECK_FOR_CHECKPOINT                      = false; //enabled only becouse of impoting old chain, never use in normal situation 
 const size_t ENABLE_CONNECTING_BETWEEN_SEED_NODES_WITH_STANDARD_CLIENT = true;
 
 // Developer fee settings
@@ -221,7 +221,10 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2100000, common::pfh<Hash>("482bfbd607e12ab06c5e5192efc8f51895c821a9d557cbb3abc8a4d83d2fc2e2")},
     {2150000, common::pfh<Hash>("072ce19602817768f5891f9da7e005af1397997a124bad3d4060aa9042d2213a")},
     {2152000, common::pfh<Hash>("80f0e2ee7b51704939c349dc790d43c14ac979201b015cb2d8f66fadea8dca57")},
-    {2152150, common::pfh<Hash>("ce175bdd800f3b549adc231b069822599d6d871c22d46db8b7509536d41ef9fc")}};
+    {2152150, common::pfh<Hash>("ce175bdd800f3b549adc231b069822599d6d871c22d46db8b7509536d41ef9fc")},
+    {2159750, common::pfh<Hash>("864ff4788dc771cb51bfda3d6bb897072982a50a132f66327fd6e8ba2f28885f")},
+    {2159756, common::pfh<Hash>("364efa737f0d0cd98a1a27912ab1c029388804c88d83f93b1917d9136ab10e2b")},
+    {2159762, common::pfh<Hash>("17c566f82b4604a7f928e0d3a245132295a1c3b0f1857bc4d2c71b39fa70b845")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 
