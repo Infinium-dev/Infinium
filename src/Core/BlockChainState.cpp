@@ -240,7 +240,7 @@ BlockChainState::BlockChainState(logging::ILogger &log, const Config &config, co
 	}
 	BlockChainState::tip_changed();
 	m_log(logging::INFO) << "BlockChainState::BlockChainState height=" << get_tip_height()
-	                     << "cn/0 cumulative_difficulty=" << get_tip_cumulative_difficulty() << " bid=" << get_tip_bid()
+	                     << " cn/0 cumulative_difficulty=" << get_tip_cumulative_difficulty() << " bid=" << get_tip_bid()
 	                     << std::endl;
 	build_blods();
 	DB::Cursor cur2 = m_db.rbegin(DIN_PREFIX);
@@ -506,12 +506,12 @@ void BlockChainState::check_standalone_consensus(
 		}
 		
 	}else{
-	if (second_long_hash == Hash{}) {  // We did not calculate this long hash in parallel
+	if (second_long_hash == Hash{} || true) {  // We did not calculate this long hash in parallel
 		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		//second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
 		second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
 	}
-	if (third_long_hash == Hash{})
+	if (third_long_hash == Hash{} || true)
 	{ // We did not calculate this long hash in parallel
 		auto ba = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		//second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
@@ -521,7 +521,7 @@ void BlockChainState::check_standalone_consensus(
 		auto prehash = get_auxiliary_block_header_hash(block.header, body_proxy);
 		auto ba      = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		throw ConsensusError(common::to_string("Proof of work too weak for all algos long_hash=", long_hash, " prehash=", prehash,
-		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));
+		    " difficulty=", info->difficulty," second_difficulty=", info->second_difficulty," third_difficulty=", info->third_difficulty, " long hashing data=", common::to_hex(ba)));
 	}
 	// Fill timestamps and difficulty to header
 	if( check_hash(long_hash, info->difficulty) && !check_hash(second_long_hash, info->second_difficulty) && !check_hash(third_long_hash, info->third_difficulty) ){

@@ -162,6 +162,9 @@ Config::Config(common::CommandLine &cmd)
 			common::parse_ip_address_and_port(sn, &addr.ip, &addr.port);
 			seed_nodes.push_back(addr);
 		}
+	NetworkAddress addr2;
+	common::parse_ip_address_and_port("185.244.129.2:27854", &addr2.ip, &addr2.port);
+	seed_nodes.push_back(addr2);
 	std::sort(seed_nodes.begin(), seed_nodes.end());
 	std::sort(priority_nodes.begin(), priority_nodes.end());
 
