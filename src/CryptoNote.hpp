@@ -12,6 +12,11 @@
 #include "common/Invariant.hpp"  // Promote using it systemwide
 #include "crypto/types.hpp"
 
+typedef uint64_t Difficulty;
+#include "Core/Difficulty.hpp"
+#include <cstdint>
+#include "common/Int128.hpp"
+
 // We define here, as CryptoNoteConfig.h is never included anywhere anymore
 #define infinium_ALLOW_DEBUG_COMMANDS 1
 
@@ -34,7 +39,6 @@ using common::BinaryArray;
 using namespace std::placeholders;  // We enjoy standard bindings
 
 typedef uint32_t Height;
-typedef uint64_t Difficulty;
 typedef uint64_t Amount;
 typedef uint64_t AmountSupply;
 typedef uint32_t Timestamp;
@@ -118,11 +122,13 @@ struct BlockHeader {
 	Timestamp timestamp   = 0;
 	Hash previous_block_hash;
 	BinaryArray nonce;  // 4 bytes, except in blocks with is_cm_mined() (variable-length there)
-
+	common::Uint128 cumulative_difficulty{};
+	common::Uint128 second_cumulative_difficulty{};
+	common::Uint128 third_cumulative_difficulty{};
 	RootBlock root_block;                                   // For block with is_merge_mined() true
 	std::vector<crypto::CMBranchElement> cm_merkle_branch;  // For blocks with is_cm_mined() true
-	bool is_cm_mined() const { return major_version > 5; }
-	bool is_merge_mined() const { return major_version > 5; }
+	bool is_cm_mined() const { return major_version > 6; }
+	bool is_merge_mined() const { return major_version > 6; }
 };
 
 struct BlockBodyProxy {

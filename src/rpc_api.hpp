@@ -148,6 +148,7 @@ struct RawBlock {
 	    transactions;  // for each transaction + coinbase, contain only info known to bytecoind
 	std::vector<std::vector<size_t>>
 	    output_stack_indexes;  // for each transaction + coinbase, not empty only if block in main chain
+	HeightOrDepth algo=0;
 };
 
 // In legacy view-only wallets sum of incoming outputs can be arbitrary large and overflow
@@ -577,13 +578,13 @@ struct GetRawBlock {
 		api::RawBlock block;
 		bool orphan_status  = false;
 		HeightOrDepth depth = 0;  // new style, -1 is top block, -2 previous block, etc
+		//HeightOrDepth pow = 0;
 	};
 	enum {
 		HASH_NOT_FOUND          = -5,  // Neither in main nor in side chain
 		INVALID_HEIGHT_OR_DEPTH = -2   // height_or_depth too low or too high
 	};
 };
-
 struct GetBlockHeader {
 	static std::string method() { return "get_block_header"; }
 	struct Request {

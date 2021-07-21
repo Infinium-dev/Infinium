@@ -62,7 +62,10 @@ public:
 	Timestamp difficulty_target_cn0_v5;
 	Timestamp difficulty_target_cn2_v5;
 	Timestamp difficulty_target_cnlite_v5;
-	Difficulty get_minimum_difficulty(uint8_t block_major_version) const;
+	Timestamp difficulty_target_cn0_v6;
+	Timestamp difficulty_target_cnzls_v6;
+	Timestamp difficulty_target_cnlite_v6;
+	Difficulty get_minimum_difficulty(uint8_t block_major_version, uint8_t pow) const;
 	Height difficulty_windows_plus_lag() const;
 	Height expected_blocks_per_day() const;
 	Height expected_blocks_per_year() const;

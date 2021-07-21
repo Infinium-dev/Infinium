@@ -570,11 +570,31 @@ bool Node::on_get_raw_block(http::Client *, http::RequestBody &&, json_rpc::Requ
 		    m_block_chain.get_chain(height_or_depth, &request.hash), "");  // after fix_height it must always succeed
 		invariant(m_block_chain.get_header(request.hash, &response.block.header), "");
 	}
-	RawBlock rb;
+	RawBlock rb; // asked block
 	invariant(m_block_chain.get_block(request.hash, &rb), "Block must be there, but it is not there");
 	Block block(rb);
-
 	api::RawBlock &b = response.block;
+		cn::api::BlockHeader previous_block_header;
+		invariant(m_block_chain.get_header(block.header.previous_block_hash, &previous_block_header), "");
+		//previous_block_header;
+		if(previous_block_header.cumulative_difficulty==response.block.header.cumulative_difficulty-1){
+			if(previous_block_header.second_cumulative_difficulty==response.block.header.second_cumulative_difficulty-1){
+				// IS CN/LITE v7 block
+				response.block.header.isSecondAlgo = 4;
+			}else{
+				if(block.header.major_version>5){
+					// IS CN/ZLS block
+					response.block.header.isSecondAlgo = 3;
+				}else{
+					// IS CN/2 block
+					response.block.header.isSecondAlgo = 2;
+				}
+			}
+		}else{
+			// IS CN/0 block
+			response.block.header.isSecondAlgo = 1;
+		}
+		
 	b.transactions.resize(block.transactions.size() + 1);
 	b.transactions.at(0).hash = get_transaction_hash(block.header.base_transaction);
 	b.transactions.at(0).size = seria::binary_size(block.header.base_transaction);
@@ -598,6 +618,7 @@ bool Node::on_get_raw_block(http::Client *, http::RequestBody &&, json_rpc::Requ
 	// If block not in main chain - global indices will be empty
 	response.orphan_status = !m_block_chain.in_chain(b.header.height, b.header.hash);
 	response.depth = api::HeightOrDepth(b.header.height) - api::HeightOrDepth(m_block_chain.get_tip_height()) - 1;
+	//response.pow = 5;
 	return true;
 }
 

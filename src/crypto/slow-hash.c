@@ -68,7 +68,7 @@
   } while(0)
 
 #define VARIANT_ZLX() \
-  uint32_t iterations = ITER; \
+  /*uint32_t*/ iterations = ITER; \
   do if (variant == 3) \
   { \
     iterations = ITER_ZLX; \
@@ -796,7 +796,7 @@ void cn_slow_hash(const void *data, size_t length, unsigned char *hash, int vari
     _b1 = _mm_load_si128(R128(b) + 1);
     // Two independent versions, one with AES, one without, to ensure that
     // the useAes test is only performed once, not every iteration.
-    //VARIANT_ZLX();
+    VARIANT_ZLX();
    // VARIANT_LITE();
     if(useAes)
     {
@@ -1153,7 +1153,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     _b = vld1q_u8((const uint8_t *)b);
     _b1 = vld1q_u8(((const uint8_t *)b) + AES_BLOCK_SIZE);
 
-    //VARIANT_ZLX();
+    VARIANT_ZLX();
 
     for(i = 0; i < iterations / 2; i++)
     {
@@ -1363,7 +1363,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     U64(b)[0] = U64(&state.k[16])[0] ^ U64(&state.k[48])[0];
     U64(b)[1] = U64(&state.k[16])[1] ^ U64(&state.k[48])[1];
 
-    //VARIANT_ZLX();
+    VARIANT_ZLX();
 
     for(i = 0; i < iterations / 2; i++)
     {
@@ -1555,7 +1555,7 @@ void cn_slow_hash(const void *data, size_t length, char *hash, int variant, int 
     a[i] = state.k[     i] ^ state.k[AES_BLOCK_SIZE * 2 + i];
     b[i] = state.k[AES_BLOCK_SIZE + i] ^ state.k[AES_BLOCK_SIZE * 3 + i];
   }
-  //VARIANT_ZLX();
+  VARIANT_ZLX();
   for (i = 0; i < iterations / 2; i++) {
     /* Dependency chain: address -> read value ------+
      * written value <-+ hard function (AES or MUL) <+

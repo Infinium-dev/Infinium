@@ -45,11 +45,19 @@ public:
 	}
 
 	inline void cn_slow_hash2(const void *src_data, size_t length, cryptoHash *hash) {
-		crypto::cn_slow_hash(src_data, length, hash->data, cn::parameters::SECOND_MINING_ALGO, 0);
+		crypto::cn_slow_hash(src_data, length, hash->data, cn::parameters::SECOND_MINING_ALGO_V5, 0);
 	}
 	inline Hash cn_slow_hash2(const void *src_data, size_t length) {
 		Hash hash;
-		crypto::cn_slow_hash(src_data, length, hash.data, cn::parameters::SECOND_MINING_ALGO, 0);
+		crypto::cn_slow_hash(src_data, length, hash.data, cn::parameters::SECOND_MINING_ALGO_V5, 0);
+		return hash;
+	}
+	inline void cn_slow_hash3(const void *src_data, size_t length, cryptoHash *hash) {
+		crypto::cn_slow_hash(src_data, length, hash->data, cn::parameters::SECOND_MINING_ALGO_V6, 0);
+	}
+	inline Hash cn_slow_hash3(const void *src_data, size_t length) {
+		Hash hash;
+		crypto::cn_slow_hash(src_data, length, hash.data, cn::parameters::SECOND_MINING_ALGO_V6, 0);
 		return hash;
 	}
 

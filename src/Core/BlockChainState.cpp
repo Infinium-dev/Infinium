@@ -441,7 +441,8 @@ void BlockChainState::check_standalone_consensus(
 	}
 
 	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/0 difficulty      : " "%" PRIu64 "\n", info->difficulty);
-	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/2 difficulty      : " "%" PRIu64 "\n", info->second_difficulty);
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF && block.header.major_version == 5) printf("CN/2 difficulty      : " "%" PRIu64 "\n", info->second_difficulty);
+	if(cn::parameters::MINING_ALGO_DEBUG_STUFF && block.header.major_version > 5) printf("CN/ZLS difficulty      : " "%" PRIu64 "\n", info->second_difficulty);
 	if(cn::parameters::MINING_ALGO_DEBUG_STUFF) printf("CN/LITE v7 difficulty: " "%" PRIu64 "\n", info->third_difficulty);
 
 	info->transactions_fee = 0;
@@ -509,7 +510,11 @@ void BlockChainState::check_standalone_consensus(
 	if (second_long_hash == Hash{} || true) {  // We did not calculate this long hash in parallel
 		auto ba   = m_currency.get_block_long_hashing_data(block.header, body_proxy);
 		//second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
-		second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
+		if (block.header.major_version == 5){
+			second_long_hash = m_hash_crypto_context.cn_slow_hash2(ba.data(), ba.size());
+		}else{ // v6 and up
+			second_long_hash = m_hash_crypto_context.cn_slow_hash3(ba.data(), ba.size());
+		}
 	}
 	if (third_long_hash == Hash{} || true)
 	{ // We did not calculate this long hash in parallel
@@ -558,7 +563,11 @@ void BlockChainState::check_standalone_consensus(
 		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));*/
 	}
 	if (!check_hash(second_long_hash, info->second_difficulty)) {
-		printf("CN/2 algo pow verification failed! \n");
+		if (block.header.major_version == 5){
+			printf("CN/2 algo pow verification failed! \n");
+		}else if(block.header.major_version > 5){
+			printf("CN/ZLS algo pow verification failed! \n");
+		}
 		/*throw ConsensusError(common::to_string("Proof of work too weak long_hash=", long_hash, " prehash=", prehash,
 		    " difficulty=", info->difficulty, " long hashing data=", common::to_hex(ba)));*/
 	}

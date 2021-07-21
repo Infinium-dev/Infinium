@@ -75,7 +75,15 @@ Currency::Currency(const std::string &net)
           DIFFICULTY_TARGET_CN2_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
 	, difficulty_target_cnlite_v5(std::max<Timestamp>(1,
           DIFFICULTY_TARGET_CNLITE_V5 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
-    , upgrade_heights{UPGRADE_HEIGHT_V2, UPGRADE_HEIGHT_V3, UPGRADE_HEIGHT_V4, UPGRADE_HEIGHT_V5}
+	// for v6
+	, difficulty_target_cnlite_v6(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CNLITE_V6 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	, difficulty_target_cnzls_v6(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CNZLS_V6 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	, difficulty_target_cn0_v6(std::max<Timestamp>(1,
+          DIFFICULTY_TARGET_CN0_V6 / platform::get_time_multiplier_for_tests()))  // multiplier can be != 1 only in testnet
+	// for v6
+    , upgrade_heights{UPGRADE_HEIGHT_V2, UPGRADE_HEIGHT_V3, UPGRADE_HEIGHT_V4, UPGRADE_HEIGHT_V5, UPGRADE_HEIGHT_V6}
     , key_image_subgroup_checking_height(KEY_IMAGE_SUBGROUP_CHECKING_HEIGHT)
     , amethyst_block_version(BLOCK_VERSION_AMETHYST)
     , amethyst_transaction_version(TRANSACTION_VERSION_AMETHYST)
@@ -220,11 +228,16 @@ uint8_t Currency::get_block_major_version_for_height(Height height) const {
 	return static_cast<uint8_t>(upgrade_heights.size() + 1);
 }
 
-Difficulty Currency::get_minimum_difficulty(uint8_t block_major_version) const {
+Difficulty Currency::get_minimum_difficulty(uint8_t block_major_version, uint8_t pow) const {
 	if (block_major_version == 1 || net == "test")
 		return MINIMUM_DIFFICULTY_V1;
 	if (block_major_version == 5)
 		return MINIMUM_DIFFICULTY_V5;
+	if (block_major_version > 5){
+		if(pow==0) return MINIMUM_DIFFICULTY_V6_CN0;
+		if(pow==2) return MINIMUM_DIFFICULTY_V6_CNLITE;
+		if(pow==1) return MINIMUM_DIFFICULTY_V6_CNZLS;
+	}
 	return MINIMUM_DIFFICULTY;
 }
 
@@ -239,6 +252,8 @@ size_t Currency::get_minimum_size_median(uint8_t block_major_version) const {
 		return MINIMUM_SIZE_MEDIAN_V3;
 	if (block_major_version == 5)
 		return MINIMUM_SIZE_MEDIAN_V5;
+	if (block_major_version == 6)
+		return MINIMUM_SIZE_MEDIAN_V6;
 	return 0;
 }
 
@@ -308,7 +323,9 @@ Amount Currency::get_base_block_reward(
 	assert(diff != 0);
     assert(static_cast<uint64_t>(diff) < (UINT64_C(1) << (sizeof(uint64_t) * 8 - log_fix_precision)));
 	Amount reward_basic = log2_fix(diff << log_fix_precision) << 20;
-	if(height > INFINIUM_BLOCK_REWARD_LOWERING)
+	if(height > UPGRADE_HEIGHT_V6){
+		reward_basic = (log2_fix(diff << log_fix_precision) << 20)/12;
+	}else if(height > INFINIUM_BLOCK_REWARD_LOWERING)
 	{
 		reward_basic = (log2_fix(diff << log_fix_precision) << 20)/2;
 	}
@@ -336,7 +353,7 @@ Height Currency::largest_window() const {
 }
 
 bool isGovernanceBlock(Height specific_block_height){
-	if(specific_block_height>cn::parameters::UPGRADE_HEIGHT_V5){
+	if(specific_block_height>cn::parameters::UPGRADE_HEIGHT_V5 && specific_block_height<(cn::parameters::UPGRADE_HEIGHT_V6+1)){
 		if(specific_block_height % 10 == 0 || specific_block_height % 10 == 2 || specific_block_height % 10 == 4 || specific_block_height % 10 == 6 || specific_block_height % 10 == 8){
         	if(cn::parameters::ENABLE_DEVELOPER_FEE_DEBUGGING_STUFF) printf("dev fee trigerred at block:  %d\n", specific_block_height);
 			return true;
@@ -682,7 +699,11 @@ Difficulty Currency::next_difficulty(
 	invariant(total_work.hi == 0, "Window difficulty difference too large");
 
 	uint64_t low, high;
-	if(block_major_version > 4){
+	if(block_major_version > 5){
+		if(pow_algo==0) low = mul128(total_work.lo, difficulty_target_cn0_v6, &high);
+		if(pow_algo==1) low = mul128(total_work.lo, difficulty_target_cnzls_v6, &high);
+		if(pow_algo==2) low = mul128(total_work.lo, difficulty_target_cnlite_v6, &high);
+	}else if(block_major_version > 4){
 		if(pow_algo==0) low = mul128(total_work.lo, difficulty_target_cn0_v5*2, &high);
 		if(pow_algo==1) low = mul128(total_work.lo, difficulty_target_cn2_v5*2, &high);
 		if(pow_algo==2) low = mul128(total_work.lo, difficulty_target_cnlite_v5*2, &high);
@@ -698,8 +719,13 @@ Difficulty Currency::next_difficulty(
 Difficulty Currency::next_effective_difficulty(uint8_t block_major_version, std::vector<Timestamp> timestamps,
     std::vector<CumulativeDifficulty> cumulative_difficulties, uint8_t pow_algo) const {
 	Difficulty difficulty = next_difficulty(&timestamps, &cumulative_difficulties, pow_algo, block_major_version);
-	if (difficulty < get_minimum_difficulty(block_major_version))  // even when it is 0
-		difficulty = get_minimum_difficulty(block_major_version);
+	if(block_major_version>5){
+		if (difficulty < get_minimum_difficulty(block_major_version, pow_algo)) // even when it is 0
+			difficulty = get_minimum_difficulty(block_major_version, pow_algo);
+	}else{
+		if (difficulty < get_minimum_difficulty(block_major_version, 0)) // even when it is 0
+			difficulty = get_minimum_difficulty(block_major_version, 0);
+	}
 	return difficulty;
 }
 

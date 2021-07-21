@@ -29,6 +29,7 @@ constexpr UUID BYTECOIN_NETWORK = { { 0x12 ,0x34, 0x56, 0x78 , 0x11, 0x78 , 0x78
 
 const Height INFINIUM_FIRST_HARDFORK                                   = 2065600;                          //First hardfork of infinium network
 const Height UPGRADE_HEIGHT_V5                                         = 2159750;                          //Developer fee & aditonal PoW hardfork
+const Height UPGRADE_HEIGHT_V6                                         = 2238860;                          //Change cn/v8 to cn/zls & disable developer fee & speedup chain & add pow api
 
 const Height UPGRADE_HEIGHT_V2                                         = INFINIUM_FIRST_HARDFORK;
 const Height UPGRADE_HEIGHT_V3                                         = INFINIUM_FIRST_HARDFORK+1;
@@ -80,6 +81,12 @@ const Difficulty MINIMUM_DIFFICULTY_V5 = 200000; // V5 blocks
 const Difficulty MINIMUM_DIFFICULTY_V1 = 1;  // Genesis and some first blocks in main net
 const Difficulty MINIMUM_DIFFICULTY    = 200;
 
+// V6 blocks
+const Difficulty MINIMUM_DIFFICULTY_V6_CN0 = 200000;
+const Difficulty MINIMUM_DIFFICULTY_V6_CNZLS = 5000;
+const Difficulty MINIMUM_DIFFICULTY_V6_CNLITE = 10000;
+// V6 blocks
+
 const Height DIFFICULTY_WINDOW = 720;
 const Height DIFFICULTY_CUT    = 60;  // out-of-family timestamps to cut after sorting
 const Height DIFFICULTY_LAG    = 15;  // skip last blocks for difficulty calcs (against lowering difficulty attack)
@@ -109,11 +116,17 @@ const Height MAX_BLOCK_NUMBER = 500000000;
 // Legacy pre amethyst locking constants
 const Height LOCKED_TX_ALLOWED_DELTA_BLOCKS = 1;
 
-// ADITIONAL MINING ALGO SETTINGS
-const int       SECOND_MINING_ALGO          = 2;    // (CN/2)
+// ADITIONAL MINING ALGO SETTINGS (V5)
+const int       SECOND_MINING_ALGO_V5          = 2;    // (CN/2)
 const Timestamp DIFFICULTY_TARGET_CN0_V5    = 189;  // 45% of blocks for cryptonigth v0 (asic)
 const Timestamp DIFFICULTY_TARGET_CN2_V5    = 1878; //  5% of blocks for cryptonight v8 (gpu, maybe FPGA)
 const Timestamp DIFFICULTY_TARGET_CNLITE_V5 = 189;  // 45% of blocks for cryptonight lite v7 (cpu, gpu)
+// ADITIONAL MINING ALGO SETTINGS (V6)
+const int       SECOND_MINING_ALGO_V6          = 3;    // (CN/ZLS)
+const Timestamp DIFFICULTY_TARGET_CN0_V6    = 45;  //  33.3% of blocks for cryptonigth v0 (asic)
+const Timestamp DIFFICULTY_TARGET_CNZLS_V6  = 45;  // 33.3% of blocks for cryptonight zls (cpu, gpu, maybe FPGA)
+const Timestamp DIFFICULTY_TARGET_CNLITE_V6 = 45;  //  33.3% of blocks for cryptonight lite v7 (cpu, gpu)
+
 const size_t    MINING_ALGO_DEBUG_STUFF     = false;// enable mining algo debuging stuff
 
 constexpr Timestamp LOCKED_TX_ALLOWED_DELTA_SECONDS(Timestamp difficulty_target) {
@@ -130,6 +143,7 @@ static_assert(BLOCK_CAPACITY_VOTE_MAX >= BLOCK_CAPACITY_VOTE_MIN, "Bad TRANSACTI
 const Height BLOCK_CAPACITY_VOTE_WINDOW = 11;
 
 // Legacy pre amethyst size limits
+const size_t MINIMUM_SIZE_MEDIAN_V6 = 300000;
 const size_t MINIMUM_SIZE_MEDIAN_V5 = 300000;
 const size_t MINIMUM_SIZE_MEDIAN_V3 = 75000;
 const size_t MINIMUM_SIZE_MEDIAN_V2 = 60000;
@@ -225,7 +239,8 @@ constexpr const HardCheckpoint CHECKPOINTS[] = {
     {2159750, common::pfh<Hash>("864ff4788dc771cb51bfda3d6bb897072982a50a132f66327fd6e8ba2f28885f")},
     {2159756, common::pfh<Hash>("364efa737f0d0cd98a1a27912ab1c029388804c88d83f93b1917d9136ab10e2b")},
     {2159762, common::pfh<Hash>("17c566f82b4604a7f928e0d3a245132295a1c3b0f1857bc4d2c71b39fa70b845")},
-    {2159763, common::pfh<Hash>("41810104ba3fe37f229edb5d887fdbd3e6b5a661c612e6323538f126e51f9297")}};
+    {2159763, common::pfh<Hash>("41810104ba3fe37f229edb5d887fdbd3e6b5a661c612e6323538f126e51f9297")},
+    {2238862, common::pfh<Hash>("7f7f83c3fa849ec2e5938ec163ffd2a91828f187712e85ec789b2bf267c6b648")}};
 
 // When adding checkpoint and BEFORE release, you MUST check that daemon fully syncs both mainnet and stagenet.
 
